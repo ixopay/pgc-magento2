@@ -1,0 +1,18 @@
+{
+    "name": "pgc/pgc-client",
+    "description": "N/A",
+    "config": {
+        "sort-packages": true
+    },
+    "require": {
+        "php": "~7.1.3||~7.2.0"
+    },
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Pgc\\Client\\": ""
+        }
+    }
+}

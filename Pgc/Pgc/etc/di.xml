@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <!-- CONFIG -->
+    <virtualType name="PgcCardConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Pgc\Pgc\Model\Ui\ConfigProvider::CREDITCARD_CODE</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="PgcConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="string">pgc_pgc</argument>
+            <argument name="pathPattern" xsi:type="string">%s/%s</argument>
+        </arguments>
+    </virtualType>
+</config>
