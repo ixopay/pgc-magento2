@@ -104,6 +104,25 @@ class Frontend extends Action
         $customer->setLastName($order->getCustomerLastname());
         $customer->setEmail($order->getCustomerEmail());
 
+        $billingAddress = $order->getBillingAddress();
+        if ($billingAddress !== null) {
+            $customer->setBillingAddress1($billingAddress->getStreet()[0]);
+            $customer->setBillingPostcode($billingAddress->getPostcode());
+            $customer->setBillingCity($billingAddress->getCity());
+            $customer->setBillingCountry($billingAddress->getCountryId());
+            $customer->setBillingPhone($billingAddress->getTelephone());
+        }
+        $shippingAddress = $order->getShippingAddress();
+        if ($shippingAddress !== null) {
+            $customer->setShippingCompany($shippingAddress->getCompany());
+            $customer->setShippingFirstName($shippingAddress->getFirstname());
+            $customer->setShippingLastName($shippingAddress->getLastname());
+            $customer->setShippingAddress1($shippingAddress->getStreet()[0]);
+            $customer->setShippingPostcode($shippingAddress->getPostcode());
+            $customer->setShippingCity($shippingAddress->getCity());
+            $customer->setShippingCountry($shippingAddress->getCountryId());
+        }
+
         $debit->setCustomer($customer);
 
         $baseUrl = $this->urlBuilder->getRouteUrl('pgc');
@@ -177,17 +196,21 @@ class Frontend extends Action
         $debit->addExtraData('3ds:channel', '02'); // Browser
         $debit->addExtraData('3ds:authenticationIndicator ', '01'); // Payment transaction
 
-        $debit->addExtraData('3ds:cardholderAuthenticationMethod', '01'); // Payment transaction
+        if ($order->getCustomerIsGuest()) {
+            $debit->addExtraData('3ds:cardholderAuthenticationMethod', '01');
+            $debit->addExtraData('3ds:cardholderAccountAgeIndicator', '01');
+        } else {
+            $debit->addExtraData('3ds:cardholderAuthenticationMethod', '02');
+            //$debit->addExtraData('3ds:cardholderAccountDate', \date('Y-m-d', $order->getCustomer()->getCreatedAtTimestamp()));
+        }
 
+        //$debit->addExtraData('3ds:shipIndicator', \date('Y-m-d', $order->getCustomer()->getCreatedAtTimestamp()));
 
-        $debit->addExtraData('3ds:cardholderAuthenticationDateTime', '01'); // Payment transaction
+        if ($order->getShippigAddressId() == $order->getBillingAddressId()) {
+            $debit->addExtraData('3ds:billingShippingAddressMatch ', 'Y');
+        } else {
+            $debit->addExtraData('3ds:billingShippingAddressMatch ', 'N');
+        }
 
-        $debit->addExtraData('3ds:cardholderAccountDate', \date('Y-m-d', $order->getCustomer()->getCreatedAtTimestamp()));
-
-
-        $debit->addExtraData('3ds:shipIndicator', \date('Y-m-d', $order->getCustomer()->getCreatedAtTimestamp()));
-
-        //$order->getaddr
-        $debit->addExtraData('3ds:billingShippingAddressMatch ', 'YN');
     }
 }
