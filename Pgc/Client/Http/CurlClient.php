@@ -232,7 +232,8 @@ class CurlClient implements ClientInterface {
             'X-Date' => $timestamp,
             'Authorization' => $authHeader,
             'X-Authorization' => $authHeader,
-            'Content-Type' => $contentType
+            'Content-Type' => $contentType,
+            'X-Source-Platform' => 'magento',
         );
 
         return $this;
@@ -268,7 +269,8 @@ class CurlClient implements ClientInterface {
             'Date' => $timestamp,
             'X-Date' => $timestamp,
             'X-Signature' => $signature,
-            'Content-Type' => $contentType
+            'Content-Type' => $contentType,
+            'X-Source-Platform' => 'magento',
         );
 
         return $this;
