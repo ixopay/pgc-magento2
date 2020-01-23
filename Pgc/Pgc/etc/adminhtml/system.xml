@@ -34,11 +34,16 @@
                         <label>config_merchant_secret</label>
                         <config_path>payment/pgc_creditcard/shared_secret</config_path>
                     </field>
-                    <field id="integration_key" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="seamless" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Seamless Integration</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <config_path>payment/pgc_creditcard/seamless</config_path>
+                    </field>
+                    <field id="integration_key" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Integration Key</label>
                         <config_path>payment/pgc_creditcard/integration_key</config_path>
                     </field>
-                    <field id="sort_order" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="sort_order" translate="label" type="text" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Sort Order</label>
                         <config_path>payment/pgc_creditcard/sort_order</config_path>
                     </field>

@@ -3,13 +3,20 @@ define(
         'Magento_Checkout/js/view/payment/default',
         "jquery",
         "mage/url",
+        'mage/translate',
         'Magento_Checkout/js/model/full-screen-loader'
     ],
-    function (Component, $, url, fullScreenLoader) {
+    function (Component, $, url, $t, fullScreenLoader) {
         'use strict';
         return Component.extend({
+            paymentJs: null,
+            transactionToken: null,
+            ccHolder: '',
+            ccMonth: '',
+            ccYear: '',
+
             defaults: {
-                template: "Pgc_Pgc/payment/creditcard"
+                template: "Pgc_Pgc/payment/creditcard",
             },
 
             initialize: function() {
@@ -17,13 +24,61 @@ define(
                 this.config = window.checkoutConfig.payment[this.getCode()];
             },
 
+            placeOrder: function (data, event) {
+
+                if (this.isSeamless()) {
+
+                    var form = '#pgc_form_' + this.getCode();
+
+                    if (!$(form).validation() || !$(form).validation('isValid')) {
+                        return;
+                    }
+
+                    const paymentJsData = {
+                        card_holder: this.ccHolder,
+                        month: this.ccMonth,
+                        year: this.ccYear,
+                    };
+
+                    this.isPlaceOrderActionAllowed(false);
+
+                    var localSuper = this._super;
+
+                    this.paymentJs.tokenize(
+                        paymentJsData,
+                        (token, cardData) => {
+                            this.transactionToken = token;
+                            this._super = localSuper;
+                            this._super(data, event);
+                            this._super = null;
+                            return true;
+                        },
+                        (errors) => {
+                            errors.forEach(message => {
+                                this.messageContainer.addErrorMessage({message: $t(message.attribute + '_' + message.key)});
+                            });
+
+                            this.isPlaceOrderActionAllowed(true);
+                            return false;
+                        }
+                    )
+                } else {
+                    this._super(data, event);
+                }
+            },
+
             afterPlaceOrder: function () {
 
                 this.redirectAfterPlaceOrder = false;
 
+                const data = {
+                    token: this.transactionToken
+                };
+
                 $.ajax({
-                    url: url.build("pgc/payment/frontend"),
+                    url: url.build('pgc/payment/frontend'),
                     type: 'post',
+                    data: data,
                     success: (result) => {
                         console.log(result);
 
@@ -41,16 +96,29 @@ define(
 
             },
 
+            isSeamless: function() {
+                return this.config.seamless;
+            },
+
             initializeJsIntegration: function() {
-                var payment = new PaymentJs("1.2");
+                this.paymentJs = new PaymentJs("1.2");
 
+                this.paymentJs.init(this.config.integration_key, 'pgc_cc_number_' + this.getCode(), 'pgc_cc_ccv_' + this.getCode(), function(payment) {
+                    var style = {
+                        'border': '1px solid #c2c2c2',
+                        'outline': 'none',
 
-                payment.init('public-integration-key', 'number_div', 'cvv_div', function(payment) {
-                    // ...
+                        'padding': '0 9px',
+                        'font-size': '14px',
+                        'width': 'calc(100% - 6px)',
+                        'height': '32px'
+                    };
+
+                    payment.setNumberStyle(style);
+                    payment.setCvvStyle(style);
 
                     payment.initRiskScript({type:'kount'});
                 });
-
             },
         });
     }

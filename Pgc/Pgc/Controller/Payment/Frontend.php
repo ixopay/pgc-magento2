@@ -104,6 +104,8 @@ class Frontend extends Action
         $customer->setLastName($order->getCustomerLastname());
         $customer->setEmail($order->getCustomerEmail());
 
+        $customer->setIpAddress($order->getRemoteIp());
+
         $billingAddress = $order->getBillingAddress();
         if ($billingAddress !== null) {
             $customer->setBillingAddress1($billingAddress->getStreet()[0]);
@@ -128,8 +130,8 @@ class Frontend extends Action
         $baseUrl = $this->urlBuilder->getRouteUrl('pgc');
 
         $debit->setSuccessUrl($this->urlBuilder->getUrl('checkout/onepage/success'));
-        $debit->setCancelUrl($baseUrl . 'payment/redirect');
-        $debit->setErrorUrl($baseUrl . 'payment/redirect');
+        $debit->setCancelUrl($baseUrl . 'payment/redirect?status=cancel');
+        $debit->setErrorUrl($baseUrl . 'payment/redirect?status=error');
 
         $debit->setCallbackUrl($baseUrl . 'payment/callback');
 
@@ -168,20 +170,6 @@ class Frontend extends Action
             //setCartToPending();
 
         } elseif ($paymentResult->getReturnType() == \Pgc\Client\Transaction\Result::RETURN_TYPE_FINISHED) {
-
-            // todo: move to callback controller
-
-            $order->setState(Order::STATE_PROCESSING);
-            $order->setStatus(Order::STATE_PROCESSING);
-
-            /** @var Order\Payment $payment */
-            $payment = $order->getPayment();
-            $payment->setTransactionId($paymentResult->getPurchaseId());
-            $payment->setLastTransId($paymentResult->getPurchaseId());
-            $payment->addTransaction('capture');
-
-            $orderResource = $this->_objectManager->get($order->getResourceName());
-            $orderResource->save($order);
 
             $response->setData([
                 'type' => 'finished',

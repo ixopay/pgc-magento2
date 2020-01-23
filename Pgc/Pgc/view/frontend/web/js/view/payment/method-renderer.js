@@ -10,8 +10,8 @@ define(
         'use strict';
         rendererList.push(
             {
-                type: "pgc_creditcard",
-                component: "Pgc_Pgc/js/view/payment/method-renderer/creditcard"
+                type: 'pgc_creditcard',
+                component: 'Pgc_Pgc/js/view/payment/method-renderer/creditcard'
             },
         );
 

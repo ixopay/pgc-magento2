@@ -1,0 +1,17 @@
+
+form.pgc_seamless {
+    margin: 0 0 10px 0;
+}
+
+form.pgc_seamless .input-expire-month {
+    float: left;
+}
+
+form.pgc_seamless .input-expire-year {
+    float: left;
+    margin: 0 0 0 10px;
+}
+
+form.pgc_seamless .input-seamless {
+    height: 32px;
+}

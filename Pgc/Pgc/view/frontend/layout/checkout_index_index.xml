@@ -1,5 +1,13 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="Pgc_Pgc::css/payment.css" />
+    </head>
+
     <body>
+        <referenceContainer name="head.additional">
+            <block class="Pgc\Pgc\Block\Checkout\PaymentJsLoader" template="Pgc_Pgc::payment-js-loader.phtml" name="pgc.checkout.script" />
+        </referenceContainer>
+
         <referenceBlock name="checkout.root">
             <arguments>
                 <argument name="jsLayout" xsi:type="array">

@@ -1,0 +1,13 @@
+
+<!-- script type="text/javascript" data-main="payment-js" src="<?= $this->getHost(); ?>js/integrated/payment.min.js"></script -->
+
+<script type="text/javascript">
+    r(function(){
+        var s = document.createElement('script');
+        s.type = 'text/javascript';
+        s.setAttribute('data-main', 'payment-js');
+        s.src = '<?= $this->getHost(); ?>js/integrated/payment.min.js';
+        document.getElementsByTagName('head')[0].appendChild(s);
+    });
+    function r(f){/in/.test(document.readyState)?setTimeout('r('+f+')',9):f()}
+</script>

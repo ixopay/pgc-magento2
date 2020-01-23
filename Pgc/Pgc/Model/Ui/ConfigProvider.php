@@ -24,7 +24,7 @@ final class ConfigProvider implements ConfigProviderInterface
             'payment' => [
                 static::CREDITCARD_CODE => [
                     'seamless' => $this->pgcHelper->getPaymentConfigDataFlag('seamless', static::CREDITCARD_CODE),
-                    'integration_key' => $this->pgcHelper->getPaymentConfigDataFlag('integration_key', static::CREDITCARD_CODE)
+                    'integration_key' => $this->pgcHelper->getPaymentConfigData('integration_key', static::CREDITCARD_CODE)
                 ]
             ],
         ];
