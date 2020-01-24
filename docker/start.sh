@@ -109,7 +109,7 @@ if [ ! -f "/setup_complete" ]; then
         php /opt/bitnami/magento/htdocs/bin/magento cache:flush
         chown -R bitnami:daemon /opt/bitnami/magento/htdocs/ 
         chmod -R 775 /opt/bitnami/magento/htdocs/
-        chmod -R 777 /opt/bitnami/magento/htdocs/generated/code/Magento/Config /opt/bitnami/magento/htdocs/pub/media/catalog/product
+        chmod -R 777 /opt/bitnami/magento/htdocs/generated/code/Magento/Config /opt/bitnami/magento/htdocs/pub/media/catalog/product /opt/bitnami/magento/htdocs/var
 
         echo -e "Setup Complete"
 
