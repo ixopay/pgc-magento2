@@ -25,9 +25,9 @@
             <fieldset class="fieldset">
 
                 <div class="field required">
-                    <label class="label">Card Holder</label>
+                    <label data-bind="attr: {for: 'pgc_cc_card_holder_' + getCode()}" class="label">Card Holder</label>
                     <div class="control">
-                        <input class="input-text required" type="text" data-validate="{required:true}" data-bind="attr: {'id': 'pgc_cc_holder_' + getCode()}, value: ccHolder">
+                        <input class="input-text required" type="text" name="pgc_cc_card_holder" data-validate="{required:true}" data-bind="attr: {'id': 'pgc_cc_card_holder_' + getCode()}, value: ccHolder">
                     </div>
                 </div>
 
@@ -36,26 +36,24 @@
                     <div class="control">
                         <div class="input-seamless" data-bind="attr: {'id': 'pgc_cc_number_' + getCode()}"></div>
                     </div>
-
-                    <div for="po_number" generated="true" class="mage-error" id="po_number-error">This is a required field.</div>
                 </div>
 
                 <div class="field required">
                     <label class="label">Expire Date</label>
                     <div class="clearfix">
                         <div class="control input-expire-month">
-                            Month <input class="input-text required" type="text" data-validate="{required:true}" data-bind="attr: {'id': 'pgc_cc_month_' + getCode()}, value: ccMonth">
+                            Month <input class="input-text required" type="text" name="pgc_cc_month" data-validate="{required:true}" data-bind="attr: {'id': 'pgc_cc_month_' + getCode()}, value: ccMonth">
                         </div>
                         <div class="control input-expire-year">
-                            Year <input class="input-text required" type="text" data-validate="{required:true}" data-bind="attr: {'id': 'pgc_cc_year_' + getCode()}, value: ccYear">
+                            Year <input class="input-text required" type="text" name="pgc_cc_year" data-validate="{required:true}" data-bind="attr: {'id': 'pgc_cc_year_' + getCode()}, value: ccYear">
                         </div>
                     </div>
                 </div>
 
                 <div class="field required">
-                    <label class="label">CCV</label>
+                    <label class="label">CVV</label>
                     <div class="control">
-                        <div class="input-seamless" data-bind="attr: {'id': 'pgc_cc_ccv_' + getCode()}"></div>
+                        <div class="input-seamless" data-bind="attr: {'id': 'pgc_cc_cvv_' + getCode()}"></div>
                     </div>
                 </div>
 

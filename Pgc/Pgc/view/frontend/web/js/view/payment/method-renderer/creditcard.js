@@ -1,10 +1,11 @@
 define(
     [
         'Magento_Checkout/js/view/payment/default',
-        "jquery",
-        "mage/url",
+        'jquery',
+        'mage/url',
         'mage/translate',
-        'Magento_Checkout/js/model/full-screen-loader'
+        'Magento_Checkout/js/model/full-screen-loader',
+        'mage/validation'
     ],
     function (Component, $, url, $t, fullScreenLoader) {
         'use strict';
@@ -16,7 +17,7 @@ define(
             ccYear: '',
 
             defaults: {
-                template: "Pgc_Pgc/payment/creditcard",
+                template: 'Pgc_Pgc/payment/creditcard',
             },
 
             initialize: function() {
@@ -28,11 +29,13 @@ define(
 
                 if (this.isSeamless()) {
 
-                    var form = '#pgc_form_' + this.getCode();
+                    var form = $('#pgc_form_' + this.getCode());
 
-                    if (!$(form).validation() || !$(form).validation('isValid')) {
+                    if (!form.validation() || !form.validation('isValid')) {
                         return;
                     }
+
+                    var validator = form.validate();
 
                     const paymentJsData = {
                         card_holder: this.ccHolder,
@@ -55,8 +58,10 @@ define(
                         },
                         (errors) => {
                             errors.forEach(message => {
-                                this.messageContainer.addErrorMessage({message: $t(message.attribute + '_' + message.key)});
+                                validator.showLabel($('#pgc_cc_' + message.attribute + '_' + this.getCode()).get(0), message.message);
                             });
+
+                            validator.showErrors();
 
                             this.isPlaceOrderActionAllowed(true);
                             return false;
@@ -90,7 +95,7 @@ define(
                         }
                     },
                     error: (err) => {
-                        console.error("Error : " + JSON.stringify(err));
+                        console.error('Error : ' + JSON.stringify(err));
                     }
                 });
 
@@ -101,9 +106,9 @@ define(
             },
 
             initializeJsIntegration: function() {
-                this.paymentJs = new PaymentJs("1.2");
+                this.paymentJs = new PaymentJs('1.2');
 
-                this.paymentJs.init(this.config.integration_key, 'pgc_cc_number_' + this.getCode(), 'pgc_cc_ccv_' + this.getCode(), function(payment) {
+                this.paymentJs.init(this.config.integration_key, 'pgc_cc_number_' + this.getCode(), 'pgc_cc_cvv_' + this.getCode(), function(payment) {
                     var style = {
                         'border': '1px solid #c2c2c2',
                         'outline': 'none',
