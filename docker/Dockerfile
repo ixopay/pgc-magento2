@@ -5,8 +5,6 @@ EXPOSE 80
 VOLUME /bitnami
 VOLUME /source
 
-ARG DEFAULT_BRANCH=master
-
 ENV ALLOW_EMPTY_PASSWORD="no" \
     BITNAMI_APP_NAME="magento" \
     BITNAMI_IMAGE_VERSION="2.3.3-debian-9-r30" \
@@ -42,7 +40,7 @@ ENV ALLOW_EMPTY_PASSWORD="no" \
     SHOP_PGC_SECRET="secret" \
     SHOP_PGC_INTEGRATION_KEY="intkey" \
     REPOSITORY="https://github.com/user/repo" \
-    BRANCH=$DEFAULT_BRANCH
+    BRANCH="master"
 
 RUN apt-get update && apt-get install -y \
   git \
