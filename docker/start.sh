@@ -115,6 +115,7 @@ if [ ! -f "/setup_complete" ]; then
         fix_symlink /opt/bitnami/magento/htdocs/app/etc /bitnami/magento/htdocs/app/etc
         fix_symlink /opt/bitnami/magento/htdocs/app/design /bitnami/magento/htdocs/app/design
         fix_symlink /opt/bitnami/magento/htdocs/app/code /bitnami/magento/htdocs/app/code
+        rm -rf /opt/bitnami/magento/htdocs/var/cache/* /opt/bitnami/magento/htdocs/var/page_cache/* /opt/bitnami/magento/htdocs/var/generation/* /opt/bitnami/magento/htdocs/app/design/code/Pgc
         chown -R bitnami:daemon /opt/bitnami/magento/htdocs/ 
         chmod -R 775 /opt/bitnami/magento/htdocs/
         chmod -R 777 /opt/bitnami/magento/htdocs/generated/code/Magento/Config /opt/bitnami/magento/htdocs/pub/media/catalog/product /opt/bitnami/magento/htdocs/var
