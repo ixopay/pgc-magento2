@@ -109,6 +109,13 @@ if [ ! -f "/setup_complete" ]; then
 
     if [ $PRECONFIGURE ]; then
         echo -e "Prepare for Pre-Configured build"
+        php /opt/bitnami/magento/htdocs/bin/magento setup:upgrade
+        php /opt/bitnami/magento/htdocs/bin/magento setup:di:compile
+        mkdir /opt/bitnami/magento/htdocs/pub/media/catalog/product
+        chown -R bitnami:daemon /opt/bitnami/magento/htdocs/
+        chown -R bitnami:daemon /magento2-sample-data/pub
+        chmod -R 775 /opt/bitnami/magento/htdocs/
+        chmod -R 777 /opt/bitnami/magento/htdocs/generated/code/Magento/Config /opt/bitnami/magento/htdocs/pub/media/catalog/product /opt/bitnami/magento/htdocs/var
         fix_symlink /opt/bitnami/magento/htdocs/var /bitnami/magento/htdocs/var
         fix_symlink /opt/bitnami/magento/htdocs/pub/static /bitnami/magento/htdocs/pub/static
         fix_symlink /opt/bitnami/magento/htdocs/pub/media /bitnami/magento/htdocs/pub/media
@@ -116,14 +123,7 @@ if [ ! -f "/setup_complete" ]; then
         fix_symlink /opt/bitnami/magento/htdocs/app/design /bitnami/magento/htdocs/app/design
         fix_symlink /opt/bitnami/magento/htdocs/app/code /bitnami/magento/htdocs/app/code
         rm -rf /opt/bitnami/magento/htdocs/var/cache/* /opt/bitnami/magento/htdocs/var/page_cache/* /opt/bitnami/magento/htdocs/var/generation/* /opt/bitnami/magento/htdocs/app/design/code/Pgc
-        php /opt/bitnami/magento/htdocs/bin/magento setup:upgrade
-        php /opt/bitnami/magento/htdocs/bin/magento setup:di:compile
         php /opt/bitnami/magento/htdocs/bin/magento cache:flush
-        mkdir /opt/bitnami/magento/htdocs/pub/media/catalog/product
-        chown -R bitnami:daemon /opt/bitnami/magento/htdocs/
-        chown -R bitnami:daemon /magento2-sample-data/pub
-        chmod -R 775 /opt/bitnami/magento/htdocs/
-        chmod -R 777 /opt/bitnami/magento/htdocs/generated/code/Magento/Config /opt/bitnami/magento/htdocs/pub/media/catalog/product /opt/bitnami/magento/htdocs/var
 
         echo -e "Setup Complete! You can access the instance at: ${MAGENTO_HOST}"
 
