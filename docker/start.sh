@@ -57,6 +57,7 @@ if [ ! -f "/setup_complete" ]; then
         git clone https://github.com/magento/magento2-sample-data /magento2-sample-data
         cd /magento2-sample-data
         git checkout 2.3.3
+        php -f /magento2-sample-data/dev/tools/build-sample-data.php -- --ce-source="/opt/bitnami/magento/htdocs/"
     fi
 
     echo -e "Configuring Magento"
@@ -108,6 +109,8 @@ if [ ! -f "/setup_complete" ]; then
 
     if [ $PRECONFIGURE ]; then
         echo -e "Prepare for Pre-Configured build"
+        php /opt/bitnami/magento/htdocs/bin/magento setup:upgrade
+        php /opt/bitnami/magento/htdocs/bin/magento setup:di:compile
 
         # Move data away from volume (would get lost after build)
         fix_symlink /opt/bitnami/magento/htdocs/var /bitnami/magento/htdocs/var
@@ -117,9 +120,6 @@ if [ ! -f "/setup_complete" ]; then
         fix_symlink /opt/bitnami/magento/htdocs/app/design /bitnami/magento/htdocs/app/design
         fix_symlink /opt/bitnami/magento/htdocs/app/code /bitnami/magento/htdocs/app/code
         
-        # Link Assets
-        php -f /magento2-sample-data/dev/tools/build-sample-data.php -- --ce-source="/opt/bitnami/magento/htdocs/"
-
         # Fix Permissions
         chown -R bitnami:daemon /opt/bitnami/magento/htdocs/
         chown -R bitnami:daemon /magento2-sample-data/pub
@@ -129,8 +129,6 @@ if [ ! -f "/setup_complete" ]; then
         
         # Clear cache
         rm -rf /opt/bitnami/magento/htdocs/var/cache/* /opt/bitnami/magento/htdocs/var/page_cache/* /opt/bitnami/magento/htdocs/var/generation/* /opt/bitnami/magento/htdocs/app/design/code/Pgc
-        php /opt/bitnami/magento/htdocs/bin/magento setup:upgrade
-        php /opt/bitnami/magento/htdocs/bin/magento setup:di:compile
         php /opt/bitnami/magento/htdocs/bin/magento cache:flush
 
         echo -e "Setup Complete! You can access the instance at: ${MAGENTO_HOST}"
@@ -140,7 +138,6 @@ if [ ! -f "/setup_complete" ]; then
         chown -R bitnami:daemon /opt/bitnami/magento/htdocs/
         chmod -R 775 /opt/bitnami/magento/htdocs/
         chmod -R 777 /opt/bitnami/magento/htdocs/generated/code/Magento/Config /opt/bitnami/magento/htdocs/pub/media/catalog/product /opt/bitnami/magento/htdocs/var
-        php -f /magento2-sample-data/dev/tools/build-sample-data.php -- --ce-source="/opt/bitnami/magento/htdocs/"
         php /opt/bitnami/magento/htdocs/bin/magento setup:upgrade
         php /opt/bitnami/magento/htdocs/bin/magento setup:di:compile
         php /opt/bitnami/magento/htdocs/bin/magento cache:flush
@@ -152,6 +149,14 @@ if [ ! -f "/setup_complete" ]; then
     fi
 
 else
+
+    # Fix Permissions
+    chown -R bitnami:daemon /opt/bitnami/magento/htdocs/
+    chown -R bitnami:daemon /magento2-sample-data/pub
+    chmod -R 775 /opt/bitnami/magento/htdocs/
+    mkdir /opt/bitnami/magento/htdocs/pub/media/catalog/product
+    chmod -R 777 /opt/bitnami/magento/htdocs/generated/code/Magento/Config /opt/bitnami/magento/htdocs/pub/media/catalog/product /opt/bitnami/magento/htdocs/var
+    
 
     # Keep script Running
     trap : TERM INT; (while true; do sleep 1m; done) & wait
