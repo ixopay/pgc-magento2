@@ -156,7 +156,9 @@ else
     chmod -R 775 /opt/bitnami/magento/htdocs/
     mkdir /opt/bitnami/magento/htdocs/pub/media/catalog/product
     chmod -R 777 /opt/bitnami/magento/htdocs/generated/code/Magento/Config /opt/bitnami/magento/htdocs/pub/media/catalog/product /opt/bitnami/magento/htdocs/var
-    
+    php /opt/bitnami/magento/htdocs/bin/magento setup:upgrade
+    php /opt/bitnami/magento/htdocs/bin/magento setup:di:compile
+    php /opt/bitnami/magento/htdocs/bin/magento cache:flush
 
     # Keep script Running
     trap : TERM INT; (while true; do sleep 1m; done) & wait
