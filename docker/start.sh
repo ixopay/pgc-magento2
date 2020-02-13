@@ -2,6 +2,8 @@
 # set -x
 set -euo pipefail
 
+ls -al /opt/bitnami/magento/htdocs/app
+
 fix_symlink() {
     unlink $1
     rm -rf $1
@@ -53,6 +55,17 @@ if [ ! -f "/setup_complete" ]; then
 
     php /opt/bitnami/magento/htdocs/bin/magento module:enable Pgc_Pgc --clear-static-content
 
+    echo -e "Import Products"
+
+    if [ ! -d "/magento2-sample-data" ]; then
+        echo -e "Checking out branch 2.3.3 from https://github.com/magento/magento2-sample-data"
+        git clone https://github.com/magento/magento2-sample-data /magento2-sample-data
+        cd /magento2-sample-data
+        git checkout 2.3.3
+        chown -R bitnami:daemon /magento2-sample-data/pub/media/catalog
+        php -f /magento2-sample-data/dev/tools/build-sample-data.php -- --ce-source="/opt/bitnami/magento/htdocs/"
+    fi
+
     # Rebuild cache and classes
     php /opt/bitnami/magento/htdocs/bin/magento setup:upgrade
     php /opt/bitnami/magento/htdocs/bin/magento setup:di:compile
@@ -103,19 +116,7 @@ if [ ! -f "/setup_complete" ]; then
         php /opt/bitnami/magento/htdocs/bin/magento config:set web/secure/use_in_adminhtml 0
     fi
 
-    echo -e "Import Products"
-
-    if [ ! -d "/magento2-sample-data" ]; then
-        echo -e "Checking out branch 2.3.3 from https://github.com/magento/magento2-sample-data"
-        git clone https://github.com/magento/magento2-sample-data /magento2-sample-data
-        cd /magento2-sample-data
-        git checkout 2.3.3
-        chown -R bitnami:daemon /magento2-sample-data/pub/media/catalog
-        php -f /magento2-sample-data/dev/tools/build-sample-data.php -- --ce-source="/opt/bitnami/magento/htdocs/"
-    fi
-
     php /opt/bitnami/magento/htdocs/bin/magento setup:upgrade
-    chown -R bitnami:daemon /magento2-sample-data/pub/media/catalog
     php /opt/bitnami/magento/htdocs/bin/magento setup:di:compile
 
     if [ $PRECONFIGURE ]; then
@@ -126,6 +127,8 @@ if [ ! -f "/setup_complete" ]; then
         fix_symlink /opt/bitnami/magento/htdocs/app/etc /bitnami/magento/htdocs/app/etc
         fix_symlink /opt/bitnami/magento/htdocs/app/design /bitnami/magento/htdocs/app/design
         fix_symlink /opt/bitnami/magento/htdocs/app/code /bitnami/magento/htdocs/app/code
+
+        php /opt/bitnami/magento/htdocs/bin/magento cache:flush
 
         # rm -rf /opt/bitnami/magento/htdocs/var/cache/* /opt/bitnami/magento/htdocs/var/page_cache/* /opt/bitnami/magento/htdocs/var/generation/* /opt/bitnami/magento/htdocs/app/design/code/Pgc
         # php /opt/bitnami/magento/htdocs/bin/magento cache:flush
