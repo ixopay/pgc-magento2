@@ -1,11 +1,12 @@
 #!/bin/bash
 # set -x
+set -euo pipefail
 
 fix_symlink() {
     unlink $1
     mkdir $1
-    cp -r $2/* $1/
-    cp -r $2/.* $1/
+    cp -rf $2/* $1/
+    cp -rf $2/.* $1/
 }
 
 echo -e "Starting Magento"
@@ -61,8 +62,8 @@ if [ ! -f "/setup_complete" ]; then
     fi
 
     # Rebuild cache and classes
-    # php /opt/bitnami/magento/htdocs/bin/magento setup:upgrade
-    # chown -R bitnami:daemon /magento2-sample-data/pub/media/catalog
+    php /opt/bitnami/magento/htdocs/bin/magento setup:upgrade
+    chown -R bitnami:daemon /magento2-sample-data/pub/media/catalog
     # php /opt/bitnami/magento/htdocs/bin/magento setup:di:compile
     # php /opt/bitnami/magento/htdocs/bin/magento cache:flush
 
@@ -126,7 +127,7 @@ if [ ! -f "/setup_complete" ]; then
         php /opt/bitnami/magento/htdocs/bin/magento cache:flush
 
         php /opt/bitnami/magento/htdocs/bin/magento setup:di:compile
-        
+
         chown -R bitnami:daemon /opt/bitnami/magento/htdocs/ 
         chmod -R 775 /opt/bitnami/magento/htdocs/
         chmod -R 777 /opt/bitnami/magento/htdocs/generated/code/Magento/Config /opt/bitnami/magento/htdocs/pub/media/catalog/product /opt/bitnami/magento/htdocs/var
