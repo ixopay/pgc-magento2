@@ -6,6 +6,7 @@ fix_symlink() {
     mkdir $1
     cp -r $2/* $1/
     cp -r $2/.* $1/
+    chown -R bitnami:daemon $1
 }
 
 echo -e "Starting Magento"
@@ -71,7 +72,7 @@ if [ ! -f "/setup_complete" ]; then
     php /opt/bitnami/magento/htdocs/bin/magento setup:upgrade
     chown -R bitnami:daemon /magento2-sample-data/pub/media/catalog
     php /opt/bitnami/magento/htdocs/bin/magento setup:di:compile
-    php /opt/bitnami/magento/htdocs/bin/magento cache:flush
+#    php /opt/bitnami/magento/htdocs/bin/magento cache:flush
 
     echo -e "Configuring Magento"
 
@@ -118,29 +119,24 @@ if [ ! -f "/setup_complete" ]; then
         php /opt/bitnami/magento/htdocs/bin/magento config:set web/secure/use_in_adminhtml 0
     fi
 
+    php /opt/bitnami/magento/htdocs/bin/magento cache:flush
+
+    chown -R bitnami:daemon /opt/bitnami/magento/htdocs
+    find /opt/bitnami/magento/htdocs -type f -exec chmod 644 {} \;
+    find /opt/bitnami/magento/htdocs -type d -exec chmod 755 {} \;
+    find /opt/bitnami/magento/htdocs/var -type d -exec chmod 777 {} \;
+    find /opt/bitnami/magento/htdocs/pub/media -type d -exec chmod 777 {} \;
+    find /opt/bitnami/magento/htdocs/pub/static -type d -exec chmod 777 {} \;
+    chmod 777 /opt/bitnami/magento/htdocs/app/etc
+    chmod 644 /opt/bitnami/magento/htdocs/app/etc/*.xml
+
     touch /setup_complete
 
+    echo -e "Setup Complete! You can access the instance at: ${MAGENTO_HOST}"
+    
     if [ $PRECONFIGURE ]; then
-        echo -e "Prepare for Pre-Configured build"
-        php /opt/bitnami/magento/htdocs/bin/magento cache:flush
-        # rm -rf /opt/bitnami/magento/htdocs/var/cache/* /opt/bitnami/magento/htdocs/var/page_cache/* /opt/bitnami/magento/htdocs/var/generation/* /opt/bitnami/magento/htdocs/app/design/code/Pgc
-        # php /opt/bitnami/magento/htdocs/bin/magento cache:flush
-        # php /opt/bitnami/magento/htdocs/bin/magento setup:di:compile
-        # chown -R bitnami:daemon /opt/bitnami/magento/htdocs/ 
-        # chmod -R 775 /opt/bitnami/magento/htdocs/
-        # chmod -R 777 /opt/bitnami/magento/htdocs/generated/code/Magento/Config /opt/bitnami/magento/htdocs/pub/media/catalog/product /opt/bitnami/magento/htdocs/var
-
-        echo -e "Setup Complete! You can access the instance at: ${MAGENTO_HOST}"
-
         kill 1
     else
-        # php /opt/bitnami/magento/htdocs/bin/magento setup:di:compile
-        # chown -R bitnami:daemon /opt/bitnami/magento/htdocs/ 
-        # chmod -R 775 /opt/bitnami/magento/htdocs/
-        # chmod -R 777 /opt/bitnami/magento/htdocs/generated/code/Magento/Config /opt/bitnami/magento/htdocs/pub/media/catalog/product /opt/bitnami/magento/htdocs/var
-
-        echo -e "Setup Complete! You can access the instance at: ${MAGENTO_HOST}"
-
         # Keep script Running
         trap : TERM INT; (while true; do sleep 1m; done) & wait
     fi
