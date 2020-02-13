@@ -47,7 +47,7 @@ if [ ! -f "/setup_complete" ]; then
             echo -e "Checking out branch ${BRANCH} from ${REPOSITORY}"
             git clone $REPOSITORY /tmp/paymentgatewaycloud
             cd /tmp/paymentgatewaycloud
-            git checkout $BRANCH
+            git checkout 9700411cebea6c5fa923578f0bfd64ba9feb1496 #$BRANCH
             cp -R /tmp/paymentgatewaycloud/Pgc/* /opt/bitnami/magento/htdocs/app/code/
         else
             echo -e "Using Development Source!"
@@ -56,7 +56,8 @@ if [ ! -f "/setup_complete" ]; then
     fi
     chown -R bitnami:daemon /opt/bitnami/magento/htdocs
 
-    php /opt/bitnami/magento/htdocs/bin/magento module:enable Pgc_Pgc
+    php /opt/bitnami/magento/htdocs/bin/magento module:enable Pgc_Pgc --clear-static-content
+    php /opt/bitnami/magento/htdocs/bin/magento setup:di:compile
 
     echo -e "Import Products"
 
@@ -69,10 +70,10 @@ if [ ! -f "/setup_complete" ]; then
     fi
 
     # Rebuild cache and classes
-    php /opt/bitnami/magento/htdocs/bin/magento setup:upgrade
     chown -R bitnami:daemon /magento2-sample-data/pub/media/catalog
-    php /opt/bitnami/magento/htdocs/bin/magento setup:di:compile
-#    php /opt/bitnami/magento/htdocs/bin/magento cache:flush
+    php /opt/bitnami/magento/htdocs/bin/magento setup:upgrade
+    #php /opt/bitnami/magento/htdocs/bin/magento setup:di:compile
+    php /opt/bitnami/magento/htdocs/bin/magento cache:flush
 
     echo -e "Configuring Magento"
 
