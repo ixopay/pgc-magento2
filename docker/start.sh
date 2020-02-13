@@ -47,7 +47,7 @@ if [ ! -f "/setup_complete" ]; then
             echo -e "Checking out branch ${BRANCH} from ${REPOSITORY}"
             git clone $REPOSITORY /tmp/paymentgatewaycloud
             cd /tmp/paymentgatewaycloud
-            git checkout 9700411cebea6c5fa923578f0bfd64ba9feb1496 #$BRANCH
+            git checkout $BRANCH
             cp -R /tmp/paymentgatewaycloud/Pgc/* /opt/bitnami/magento/htdocs/app/code/
         else
             echo -e "Using Development Source!"
