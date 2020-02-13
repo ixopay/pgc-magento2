@@ -77,28 +77,5 @@ To successfully test a payment flow you will need merchant credentials for the p
  SHOP_PGC_API_KEY="key"
  SHOP_PGC_SECRET="secret"
  SHOP_PGC_INTEGRATION_KEY="int-key"
+ SHOP_PGC_SEAMLESS="1"
 ```
-
-Additional platform specific settings:
-
-```bash
- # Enable or disable payments for specific schemes
- SHOP_PGC_CC_AMEX="True"
- SHOP_PGC_CC_DINERS="True"
- SHOP_PGC_CC_DISCOVER="True"
- SHOP_PGC_CC_JCB="True"
- SHOP_PGC_CC_MAESTRO="True"
- SHOP_PGC_CC_MASTERCARD="True"
- SHOP_PGC_CC_UNIOPNPAY="True"
- SHOP_PGC_CC_VISA="True"
- # Either use "debit" or "preauthorize" transaction requests
- SHOP_PGC_CC_TYPE="debit"
- SHOP_PGC_CC_TYPE_AMEX="debit"
- SHOP_PGC_CC_TYPE_DINERS="debit"
- SHOP_PGC_CC_TYPE_DISCOVER="debit"
- SHOP_PGC_CC_TYPE_JCB="debit"
- SHOP_PGC_CC_TYPE_MAESTRO="debit"
- SHOP_PGC_CC_TYPE_MASTERCARD="debit"
- SHOP_PGC_CC_TYPE_UNIOPNPAY="debit"
- SHOP_PGC_CC_TYPE_VISA="debit"
- ```

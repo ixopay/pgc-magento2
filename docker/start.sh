@@ -105,6 +105,7 @@ if [ ! -f "/setup_complete" ]; then
         php /opt/bitnami/magento/htdocs/bin/magento config:set payment/pgc_creditcard/shared_secret "$SHOP_PGC_SECRET"
         php /opt/bitnami/magento/htdocs/bin/magento config:set payment/pgc_creditcard/integration_key "$SHOP_PGC_INTEGRATION_KEY"
         php /opt/bitnami/magento/htdocs/bin/magento config:set payment/pgc_creditcard/sort_order 1
+        php /opt/bitnami/magento/htdocs/bin/magento config:set payment/pgc_creditcard/seamless "$SHOP_PGC_SEAMLESS"
     fi
 
     # Where to use https per default
@@ -122,13 +123,7 @@ if [ ! -f "/setup_complete" ]; then
     php /opt/bitnami/magento/htdocs/bin/magento cache:flush
 
     chown -R bitnami:daemon /opt/bitnami/magento/htdocs
-    find /opt/bitnami/magento/htdocs -type f -exec chmod 644 {} \;
-    find /opt/bitnami/magento/htdocs -type d -exec chmod 755 {} \;
-    find /opt/bitnami/magento/htdocs/var -type d -exec chmod 777 {} \;
-    find /opt/bitnami/magento/htdocs/pub/media -type d -exec chmod 777 {} \;
-    find /opt/bitnami/magento/htdocs/pub/static -type d -exec chmod 777 {} \;
-    chmod 777 /opt/bitnami/magento/htdocs/app/etc
-    chmod 644 /opt/bitnami/magento/htdocs/app/etc/*.xml
+    chmod -R 775 /opt/bitnami/magento/htdocs
 
     touch /setup_complete
 

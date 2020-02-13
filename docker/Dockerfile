@@ -12,6 +12,7 @@ ENV PRECONFIGURE="" \
     SHOP_PGC_PASSWORD="test-pass" \
     SHOP_PGC_API_KEY="key" \
     SHOP_PGC_SECRET="secret" \
+    SHOP_PGC_SEAMLESS="1" \
     SHOP_PGC_INTEGRATION_KEY="intkey" \
     REPOSITORY="https://github.com/user/repo" \
     BRANCH="master"
