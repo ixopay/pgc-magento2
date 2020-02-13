@@ -51,20 +51,9 @@ if [ ! -f "/setup_complete" ]; then
 
     php /opt/bitnami/magento/htdocs/bin/magento module:enable Pgc_Pgc
 
-    echo -e "Import Products"
-
-    if [ ! -d "/magento2-sample-data" ]; then
-        echo -e "Checking out branch 2.3.3 from https://github.com/magento/magento2-sample-data"
-        git clone https://github.com/magento/magento2-sample-data /magento2-sample-data
-        cd /magento2-sample-data
-        git checkout 2.3.3
-        php -f /magento2-sample-data/dev/tools/build-sample-data.php -- --ce-source="/opt/bitnami/magento/htdocs/"
-    fi
-
     # Rebuild cache and classes
     php /opt/bitnami/magento/htdocs/bin/magento setup:upgrade
-    chown -R bitnami:daemon /magento2-sample-data/pub/media/catalog
-    # php /opt/bitnami/magento/htdocs/bin/magento setup:di:compile
+    php /opt/bitnami/magento/htdocs/bin/magento setup:di:compile
     # php /opt/bitnami/magento/htdocs/bin/magento cache:flush
 
     echo -e "Configuring Magento"
@@ -112,6 +101,21 @@ if [ ! -f "/setup_complete" ]; then
         php /opt/bitnami/magento/htdocs/bin/magento config:set web/secure/use_in_adminhtml 0
     fi
 
+    echo -e "Import Products"
+
+    if [ ! -d "/magento2-sample-data" ]; then
+        echo -e "Checking out branch 2.3.3 from https://github.com/magento/magento2-sample-data"
+        git clone https://github.com/magento/magento2-sample-data /magento2-sample-data
+        cd /magento2-sample-data
+        git checkout 2.3.3
+        chown -R bitnami:daemon /magento2-sample-data/pub/media/catalog
+        php -f /magento2-sample-data/dev/tools/build-sample-data.php -- --ce-source="/opt/bitnami/magento/htdocs/"
+    fi
+
+    php /opt/bitnami/magento/htdocs/bin/magento setup:upgrade
+    chown -R bitnami:daemon /magento2-sample-data/pub/media/catalog
+    php /opt/bitnami/magento/htdocs/bin/magento setup:di:compile
+
     touch /setup_complete
 
     if [ $PRECONFIGURE ]; then
@@ -128,8 +132,10 @@ if [ ! -f "/setup_complete" ]; then
 
         php /opt/bitnami/magento/htdocs/bin/magento setup:di:compile
 
-        chown -R bitnami:daemon /opt/bitnami/magento/htdocs/ 
+        chown -R bitnami:daemon /opt/bitnami/magento/htdocs/
+        chown -R bitnami:daemon /magento2-sample-data/pub
         chmod -R 775 /opt/bitnami/magento/htdocs/
+        mkdir /opt/bitnami/magento/htdocs/pub/media/catalog/product
         chmod -R 777 /opt/bitnami/magento/htdocs/generated/code/Magento/Config /opt/bitnami/magento/htdocs/pub/media/catalog/product /opt/bitnami/magento/htdocs/var
 
         echo -e "Setup Complete! You can access the instance at: ${MAGENTO_HOST}"
@@ -138,8 +144,11 @@ if [ ! -f "/setup_complete" ]; then
     else
         php /opt/bitnami/magento/htdocs/bin/magento cache:flush
         php /opt/bitnami/magento/htdocs/bin/magento setup:di:compile
-        chown -R bitnami:daemon /opt/bitnami/magento/htdocs/ 
+
+        chown -R bitnami:daemon /opt/bitnami/magento/htdocs/
+        chown -R bitnami:daemon /magento2-sample-data/pub
         chmod -R 775 /opt/bitnami/magento/htdocs/
+        mkdir /opt/bitnami/magento/htdocs/pub/media/catalog/product
         chmod -R 777 /opt/bitnami/magento/htdocs/generated/code/Magento/Config /opt/bitnami/magento/htdocs/pub/media/catalog/product /opt/bitnami/magento/htdocs/var
 
         echo -e "Setup Complete! You can access the instance at: ${MAGENTO_HOST}"
