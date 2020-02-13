@@ -20,6 +20,13 @@ if [ ! -f "/setup_complete" ]; then
 
     while (! $(curl --silent -H "Host: ${MAGENTO_HOST}" http://localhost:80/index.php/ | grep "CMS homepage" > /dev/null)); do sleep 2s; done
 
+    fix_symlink /opt/bitnami/magento/htdocs/var /bitnami/magento/htdocs/var
+    fix_symlink /opt/bitnami/magento/htdocs/pub/static /bitnami/magento/htdocs/pub/static
+    fix_symlink /opt/bitnami/magento/htdocs/pub/media /bitnami/magento/htdocs/pub/media
+    fix_symlink /opt/bitnami/magento/htdocs/app/etc /bitnami/magento/htdocs/app/etc
+    fix_symlink /opt/bitnami/magento/htdocs/app/design /bitnami/magento/htdocs/app/design
+    fix_symlink /opt/bitnami/magento/htdocs/app/code /bitnami/magento/htdocs/app/code
+
     echo -e "Installing PGC Extension"
 
     mkdir -p /opt/bitnami/magento/htdocs/app/code/
@@ -115,24 +122,18 @@ if [ ! -f "/setup_complete" ]; then
 
     if [ $PRECONFIGURE ]; then
         echo -e "Prepare for Pre-Configured build"
-        fix_symlink /opt/bitnami/magento/htdocs/var /bitnami/magento/htdocs/var
-        fix_symlink /opt/bitnami/magento/htdocs/pub/static /bitnami/magento/htdocs/pub/static
-        fix_symlink /opt/bitnami/magento/htdocs/pub/media /bitnami/magento/htdocs/pub/media
-        fix_symlink /opt/bitnami/magento/htdocs/app/etc /bitnami/magento/htdocs/app/etc
-        fix_symlink /opt/bitnami/magento/htdocs/app/design /bitnami/magento/htdocs/app/design
-        fix_symlink /opt/bitnami/magento/htdocs/app/code /bitnami/magento/htdocs/app/code
-        rm -rf /opt/bitnami/magento/htdocs/var/cache/* /opt/bitnami/magento/htdocs/var/page_cache/* /opt/bitnami/magento/htdocs/var/generation/* /opt/bitnami/magento/htdocs/app/design/code/Pgc
         php /opt/bitnami/magento/htdocs/bin/magento cache:flush
-        php /opt/bitnami/magento/htdocs/bin/magento setup:di:compile
-        chown -R bitnami:daemon /opt/bitnami/magento/htdocs/ 
-        chmod -R 775 /opt/bitnami/magento/htdocs/
-        chmod -R 777 /opt/bitnami/magento/htdocs/generated/code/Magento/Config /opt/bitnami/magento/htdocs/pub/media/catalog/product /opt/bitnami/magento/htdocs/var
+        # rm -rf /opt/bitnami/magento/htdocs/var/cache/* /opt/bitnami/magento/htdocs/var/page_cache/* /opt/bitnami/magento/htdocs/var/generation/* /opt/bitnami/magento/htdocs/app/design/code/Pgc
+        # php /opt/bitnami/magento/htdocs/bin/magento cache:flush
+        # php /opt/bitnami/magento/htdocs/bin/magento setup:di:compile
+        # chown -R bitnami:daemon /opt/bitnami/magento/htdocs/ 
+        # chmod -R 775 /opt/bitnami/magento/htdocs/
+        # chmod -R 777 /opt/bitnami/magento/htdocs/generated/code/Magento/Config /opt/bitnami/magento/htdocs/pub/media/catalog/product /opt/bitnami/magento/htdocs/var
 
         echo -e "Setup Complete! You can access the instance at: ${MAGENTO_HOST}"
 
         kill 1
     else
-        php /opt/bitnami/magento/htdocs/bin/magento cache:flush
         # php /opt/bitnami/magento/htdocs/bin/magento setup:di:compile
         # chown -R bitnami:daemon /opt/bitnami/magento/htdocs/ 
         # chmod -R 775 /opt/bitnami/magento/htdocs/
