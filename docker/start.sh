@@ -1,15 +1,11 @@
 #!/bin/bash
 # set -x
-set -euo pipefail
-
-ls -al /opt/bitnami/magento/htdocs/app
 
 fix_symlink() {
     unlink $1
-    rm -rf $1
     mkdir $1
-    cp -rf $2/* $1/
-    cp -rf $2/.* $1/
+    cp -r $2/* $1/
+    cp -r $2/.* $1/
 }
 
 echo -e "Starting Magento"
@@ -33,7 +29,7 @@ if [ ! -f "/setup_complete" ]; then
             ZIP_NAME=$(basename "${BUILD_ARTIFACT}")
             mkdir /tmp/source
             unzip /dist/paymentgatewaycloud.zip -d /tmp/source
-            cp -r /tmp/source/* /opt/bitnami/magento/htdocs/app/code/
+            cp -R /tmp/source/* /opt/bitnami/magento/htdocs/app/code/
         else
             echo "Faled to build!, there is no such file: ${BUILD_ARTIFACT}"
             exit 1
@@ -44,16 +40,15 @@ if [ ! -f "/setup_complete" ]; then
             git clone $REPOSITORY /tmp/paymentgatewaycloud
             cd /tmp/paymentgatewaycloud
             git checkout $BRANCH
-            cp -r /tmp/paymentgatewaycloud/* /opt/bitnami/magento/htdocs/app/code/
+            cp -R /tmp/paymentgatewaycloud/* /opt/bitnami/magento/htdocs/app/code/
         else
             echo -e "Using Development Source!"
-            cp -r /source/* /opt/bitnami/magento/htdocs/app/code/
+            cp -R /source/* /opt/bitnami/magento/htdocs/app/code/
         fi
     fi
-    rm -rf /opt/bitnami/magento/htdocs/generated/code/Magento
     chown -R bitnami:daemon /opt/bitnami/magento/htdocs
 
-    php /opt/bitnami/magento/htdocs/bin/magento module:enable Pgc_Pgc --clear-static-content
+    php /opt/bitnami/magento/htdocs/bin/magento module:enable Pgc_Pgc
 
     echo -e "Import Products"
 
@@ -62,14 +57,14 @@ if [ ! -f "/setup_complete" ]; then
         git clone https://github.com/magento/magento2-sample-data /magento2-sample-data
         cd /magento2-sample-data
         git checkout 2.3.3
-        chown -R bitnami:daemon /magento2-sample-data/pub/media/catalog
         php -f /magento2-sample-data/dev/tools/build-sample-data.php -- --ce-source="/opt/bitnami/magento/htdocs/"
     fi
 
     # Rebuild cache and classes
     php /opt/bitnami/magento/htdocs/bin/magento setup:upgrade
+    chown -R bitnami:daemon /magento2-sample-data/pub/media/catalog
     php /opt/bitnami/magento/htdocs/bin/magento setup:di:compile
-    #php /opt/bitnami/magento/htdocs/bin/magento cache:flush
+    php /opt/bitnami/magento/htdocs/bin/magento cache:flush
 
     echo -e "Configuring Magento"
 
@@ -116,8 +111,7 @@ if [ ! -f "/setup_complete" ]; then
         php /opt/bitnami/magento/htdocs/bin/magento config:set web/secure/use_in_adminhtml 0
     fi
 
-    php /opt/bitnami/magento/htdocs/bin/magento setup:upgrade
-    php /opt/bitnami/magento/htdocs/bin/magento setup:di:compile
+    touch /setup_complete
 
     if [ $PRECONFIGURE ]; then
         echo -e "Prepare for Pre-Configured build"
@@ -127,58 +121,22 @@ if [ ! -f "/setup_complete" ]; then
         fix_symlink /opt/bitnami/magento/htdocs/app/etc /bitnami/magento/htdocs/app/etc
         fix_symlink /opt/bitnami/magento/htdocs/app/design /bitnami/magento/htdocs/app/design
         fix_symlink /opt/bitnami/magento/htdocs/app/code /bitnami/magento/htdocs/app/code
-
+        rm -rf /opt/bitnami/magento/htdocs/var/cache/* /opt/bitnami/magento/htdocs/var/page_cache/* /opt/bitnami/magento/htdocs/var/generation/* /opt/bitnami/magento/htdocs/app/design/code/Pgc
         php /opt/bitnami/magento/htdocs/bin/magento cache:flush
-
-        # rm -rf /opt/bitnami/magento/htdocs/var/cache/* /opt/bitnami/magento/htdocs/var/page_cache/* /opt/bitnami/magento/htdocs/var/generation/* /opt/bitnami/magento/htdocs/app/design/code/Pgc
-        # php /opt/bitnami/magento/htdocs/bin/magento cache:flush
-
-        # php /opt/bitnami/magento/htdocs/bin/magento setup:di:compile
-
-        # chown -R bitnami:daemon /opt/bitnami/magento/htdocs/
-        # chown -R bitnami:daemon /magento2-sample-data/pub
-
-        # find /opt/bitnami/magento/htdocs -type f -exec chmod 644 {} \;
-        # find /opt/bitnami/magento/htdocs -type d -exec chmod 755 {} \;
-        # find /opt/bitnami/magento/htdocs/var -type d -exec chmod 777 {} \;
-        # find /opt/bitnami/magento/htdocs/pub/media -type d -exec chmod 777 {} \;
-        # find /opt/bitnami/magento/htdocs/pub/static -type d -exec chmod 777 {} \;
-        # chmod 777 /opt/bitnami/magento/htdocs/app/etc
-        # chmod 644 /opt/bitnami/magento/htdocs/app/etc/*.xml
-
-        touch /setup_complete
+        php /opt/bitnami/magento/htdocs/bin/magento setup:di:compile
+        chown -R bitnami:daemon /opt/bitnami/magento/htdocs/ 
+        chmod -R 775 /opt/bitnami/magento/htdocs/
+        chmod -R 777 /opt/bitnami/magento/htdocs/generated/code/Magento/Config /opt/bitnami/magento/htdocs/pub/media/catalog/product /opt/bitnami/magento/htdocs/var
 
         echo -e "Setup Complete! You can access the instance at: ${MAGENTO_HOST}"
 
         kill 1
     else
-
-        echo -e "Setup Complete! You can access the instance at: ${MAGENTO_HOST}"
-        sleep 5m;
-        fix_symlink /opt/bitnami/magento/htdocs/var /bitnami/magento/htdocs/var
-        fix_symlink /opt/bitnami/magento/htdocs/pub/static /bitnami/magento/htdocs/pub/static
-        fix_symlink /opt/bitnami/magento/htdocs/pub/media /bitnami/magento/htdocs/pub/media
-        fix_symlink /opt/bitnami/magento/htdocs/app/etc /bitnami/magento/htdocs/app/etc
-        fix_symlink /opt/bitnami/magento/htdocs/app/design /bitnami/magento/htdocs/app/design
-        fix_symlink /opt/bitnami/magento/htdocs/app/code /bitnami/magento/htdocs/app/code
-        # php /opt/bitnami/magento/htdocs/bin/magento cache:flush
+        php /opt/bitnami/magento/htdocs/bin/magento cache:flush
         # php /opt/bitnami/magento/htdocs/bin/magento setup:di:compile
-
-        # chown -R bitnami:daemon /opt/bitnami/magento/htdocs/
-        # chown -R bitnami:daemon /magento2-sample-data/pub
+        # chown -R bitnami:daemon /opt/bitnami/magento/htdocs/ 
         # chmod -R 775 /opt/bitnami/magento/htdocs/
-        # mkdir /opt/bitnami/magento/htdocs/pub/media/catalog/product
         # chmod -R 777 /opt/bitnami/magento/htdocs/generated/code/Magento/Config /opt/bitnami/magento/htdocs/pub/media/catalog/product /opt/bitnami/magento/htdocs/var
-
-        # find /opt/bitnami/magento/htdocs -type f -exec chmod 644 {} \;
-        # find /opt/bitnami/magento/htdocs -type d -exec chmod 755 {} \;
-        # find /opt/bitnami/magento/htdocs/var -type d -exec chmod 777 {} \;
-        # find /opt/bitnami/magento/htdocs/pub/media -type d -exec chmod 777 {} \;
-        # find /opt/bitnami/magento/htdocs/pub/static -type d -exec chmod 777 {} \;
-        # chmod 777 /opt/bitnami/magento/htdocs/app/etc
-        # chmod 644 /opt/bitnami/magento/htdocs/app/etc/*.xml
-
-        touch /setup_complete
 
         echo -e "Setup Complete! You can access the instance at: ${MAGENTO_HOST}"
 
