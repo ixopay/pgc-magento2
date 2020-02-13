@@ -1,0 +1,63 @@
+version: '3'
+services:
+  mariadb:
+    image: 'bitnami/mariadb:10.2'
+    hostname: mariadb
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - MARIADB_USER=bn_magento
+      - MARIADB_PASSWORD=magento_db_password
+      - MARIADB_DATABASE=bitnami_magento
+  elasticsearch:
+    image: 'bitnami/elasticsearch:6'
+  magento:
+    build: 'docker/'
+    volumes:
+      - '.:/source'
+      - '${BUILD_ARTIFACT:-undefined}:/dist/paymentgatewaycloud.zip'
+    ports:
+      - '80:80'
+      - '443:443'
+    environment:
+      - ALLOW_EMPTY_PASSWORD=${ALLOW_EMPTY_PASSWORD:-yes}
+      - BITNAMI_APP_NAME=${BITNAMI_APP_NAME:-magento}
+      - BITNAMI_IMAGE_VERSION=${BITNAMI_IMAGE_VERSION:-latest}
+      - ELASTICSEARCH_HOST=${ELASTICSEARCH_HOST}
+      - ELASTICSEARCH_PORT_NUMBER=${ELASTICSEARCH_PORT_NUMBER}
+      - EXTERNAL_HTTPS_PORT_NUMBER=${EXTERNAL_HTTPS_PORT_NUMBER:-443}
+      - EXTERNAL_HTTP_PORT_NUMBER=${EXTERNAL_HTTP_PORT_NUMBER:-80}
+      - MAGENTO_ADMINURI=${MAGENTO_ADMINURI:-admin}
+      - MAGENTO_DATABASE_NAME=${MAGENTO_DATABASE_NAME:-bitnami_magento}
+      - MAGENTO_DATABASE_PASSWORD=${MAGENTO_DATABASE_PASSWORD:-magento_db_password}
+      - MAGENTO_DATABASE_USER=${MAGENTO_DATABASE_USER:-bn_magento}
+      - MAGENTO_EMAIL=${MAGENTO_EMAIL:-user@example.com}
+      - MAGENTO_FIRSTNAME=${MAGENTO_FIRSTNAME:-FirstName}
+      - MAGENTO_HOST=${MAGENTO_HOST:-127.0.0.1}
+      - MAGENTO_LASTNAME=${MAGENTO_LASTNAME:-LastName}
+      - MAGENTO_MODE=${MAGENTO_MODE:-developer}
+      - MAGENTO_PASSWORD=${MAGENTO_PASSWORD:-bitnami1}
+      - MAGENTO_USERNAME=${MAGENTO_USERNAME:-user}
+      - MARIADB_HOST=${MARIADB_HOST:-mariadb}
+      - MARIADB_PORT_NUMBER=${MARIADB_PORT_NUMBER:-3306}
+      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+      - MARIADB_ROOT_USER=${MARIADB_ROOT_USER:-root}
+      - MYSQL_CLIENT_CREATE_DATABASE_NAME=${MYSQL_CLIENT_CREATE_DATABASE_NAME}
+      - MYSQL_CLIENT_CREATE_DATABASE_PASSWORD=${MYSQL_CLIENT_CREATE_DATABASE_PASSWORD}
+      - MYSQL_CLIENT_CREATE_DATABASE_PRIVILEGES=${MYSQL_CLIENT_CREATE_DATABASE_PRIVILEGES:-ALL}
+      - MYSQL_CLIENT_CREATE_DATABASE_USER=${MYSQL_CLIENT_CREATE_DATABASE_USER}
+      - PRECONFIGURE=${PRECONFIGURE}
+      - SHOP_PGC_URL=${SHOP_PGC_URL:-sandbox}
+      - SHOP_PGC_USER=${SHOP_PGC_USER:-test-user}
+      - SHOP_PGC_PASSWORD=${SHOP_PGC_PASSWORD:-test-pass}
+      - SHOP_PGC_API_KEY=${SHOP_PGC_API_KEY:-key}
+      - SHOP_PGC_SECRET=${SHOP_PGC_SECRET:-secret}
+      - SHOP_PGC_INTEGRATION_KEY=${SHOP_PGC_INTEGRATION_KEY:-int_key}
+      - REPOSITORY=${REPOSITORY:-https://github.com/user/repo}
+      - BRANCH=${BRANCH:-master}
+      - BUILD_ARTIFACT=${BUILD_ARTIFACT:-undefined}
+    depends_on:
+      - mariadb
+      - elasticsearch
+
+volumes:
+  undefined:
