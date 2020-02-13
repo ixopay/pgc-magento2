@@ -126,6 +126,8 @@ if [ ! -f "/setup_complete" ]; then
 
     chown -R bitnami:daemon /opt/bitnami/magento/htdocs
     chmod -R 775 /opt/bitnami/magento/htdocs
+    chmod -R 777 /opt/bitnami/magento/htdocs/pub/media
+    chmod -R 777 /magento2-sample-data
 
     touch /setup_complete
 
