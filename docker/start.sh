@@ -48,14 +48,15 @@ if [ ! -f "/setup_complete" ]; then
             git clone $REPOSITORY /tmp/paymentgatewaycloud
             cd /tmp/paymentgatewaycloud
             git checkout $BRANCH
-            cp -R /tmp/paymentgatewaycloud/Pgc/* /opt/bitnami/magento/htdocs/app/code/
+            cp -R /tmp/paymentgatewaycloud/* /opt/bitnami/magento/htdocs/app/code/
         else
             echo -e "Using Development Source!"
-            cp -R /source/Pgc/* /opt/bitnami/magento/htdocs/app/code/
+            cp -R /source/* /opt/bitnami/magento/htdocs/app/code/
         fi
     fi
     chown -R bitnami:daemon /opt/bitnami/magento/htdocs
 
+    rm -rf /opt/bitnami/magento/htdocs/generated/code/Magento
     php /opt/bitnami/magento/htdocs/bin/magento module:enable Pgc_Pgc --clear-static-content
     php /opt/bitnami/magento/htdocs/bin/magento setup:di:compile
 
