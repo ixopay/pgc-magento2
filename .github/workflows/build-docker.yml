@@ -1,0 +1,13 @@
+name: Build Docker Image
+on: [release]
+
+jobs:
+  build:
+    name: Webhook
+    runs-on: ubuntu-latest
+    steps:
+      - name: Webhook
+        uses: zzzze/webhook-trigger@master
+        with:
+          webhook_url: ${{ secrets.WEBHOOK_URL }}
+          options: "--form ref=master --form token=${{ secrets.TOKEN }} --form \"variables[BUILD_TARGET]=magento\""
