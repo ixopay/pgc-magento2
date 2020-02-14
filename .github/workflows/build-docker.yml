@@ -10,4 +10,4 @@ jobs:
         uses: zzzze/webhook-trigger@master
         with:
           webhook_url: ${{ secrets.WEBHOOK_URL }}
-          options: "--form ref=master --form token=${{ secrets.TOKEN }} --form \"variables[BUILD_TARGET]=magento\""
+          options: "--form ref=master --form token=${{ secrets.TOKEN }} --form \"variables[BUILD_TARGET]=magento\" --form \"variables[BUILD_TARGET_BRANCH]=${{ github.ref }}\""
