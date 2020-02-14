@@ -18,8 +18,8 @@ services:
       - mariadb
       - elasticsearch
     environment:
-      #- NAMI_LOG_LEVEL=trace8
       - ALLOW_EMPTY_PASSWORD=${ALLOW_EMPTY_PASSWORD:-yes}
+      - WHITELABEL=${WHITELABEL:-}
       - BITNAMI_APP_NAME=${BITNAMI_APP_NAME:-magento}
       - BITNAMI_IMAGE_VERSION=${BITNAMI_IMAGE_VERSION:-latest}
       - ELASTICSEARCH_HOST=${ELASTICSEARCH_HOST}

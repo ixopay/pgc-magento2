@@ -2,12 +2,10 @@ name: Build Staging Docker Image
 on: [push]
 
 jobs:
-  build:
-    name: Webhook
+  curl:
     runs-on: ubuntu-latest
     steps:
-      - name: Webhook
-        uses: zzzze/webhook-trigger@master
-        with:
-          webhook_url: ${{ secrets.WEBHOOK_URL }}
-          options: "--form ref=master --form token=${{ secrets.TOKEN }} --form \"variables[BUILD_TARGET]=magento-stag\" --form \"variables[BUILD_TARGET_BRANCH]=${{ github.ref }}\""
+    - name: curl
+      uses: wei/curl@v1
+      with:
+        args: -X POST --form "ref=master" --form "token=${{ secrets.TOKEN }}" --form "variables[BUILD_TARGET]=magento-stag" --form "variables[BUILD_TARGET_BRANCH]="${GITHUB_REF##*/}" "${{ secrets.WEBHOOK_URL }}"
