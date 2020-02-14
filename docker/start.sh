@@ -30,6 +30,7 @@ if [ ! -f "/setup_complete" ]; then
 
     echo -e "Installing PGC Extension"
 
+    DB_FIELD_NAME="pgc"
     mkdir -p /opt/bitnami/magento/htdocs/app/code/
     if [ "${BUILD_ARTIFACT}" != "undefined" ]; then
         if [ -f /dist/paymentgatewaycloud.zip ]; then
@@ -48,10 +49,31 @@ if [ ! -f "/setup_complete" ]; then
             git clone $REPOSITORY /tmp/paymentgatewaycloud
             cd /tmp/paymentgatewaycloud
             git checkout $BRANCH
-            cp -R /tmp/paymentgatewaycloud/* /opt/bitnami/magento/htdocs/app/code/
+            if [ ! -z "${WHITELABEL}" ]; then
+                echo -e "Whitelabeling for Magento not Supported yet!"
+                cp -R /tmp/paymentgatewaycloud/* /opt/bitnami/magento/htdocs/app/code/
+                #echo -e "Running Whitelabel Script for ${WHITELABEL}"
+                #DEST_FILE="$(echo "y" | php build.php "gateway.mypaymentprovider.com" "${WHITELABEL}" | tail -n 1 | sed 's/.*Created file "\(.*\)".*/\1/g')"
+                #DB_FIELD_NAME="$(php /whitelabel.php snakeCase "${WHITELABEL}")"
+                #unzip "${DEST_FILE}" -d /tmp/source
+                #cp -R /tmp/source/* /opt/bitnami/magento/htdocs/app/code/
+            else
+                cp -R /tmp/paymentgatewaycloud/* /opt/bitnami/magento/htdocs/app/code/
+            fi
         else
             echo -e "Using Development Source!"
-            cp -R /source/* /opt/bitnami/magento/htdocs/app/code/
+            cd /source/
+            if [ ! -z "${WHITELABEL}" ]; then
+                echo -e "Whitelabeling for Magento not Supported yet!"
+                cp -R /source/* /opt/bitnami/magento/htdocs/app/code/
+                #echo -e "Running Whitelabel Script for ${WHITELABEL}"
+                #DEST_FILE="$(echo "y" | php build.php "gateway.mypaymentprovider.com" "${WHITELABEL}" | tail -n 1 | sed 's/.*Created file "\(.*\)".*/\1/g')"
+                #DB_FIELD_NAME="$(php /whitelabel.php snakeCase "${WHITELABEL}")"
+                #unzip "${DEST_FILE}" -d /tmp/source
+                #cp -R /tmp/source/* /opt/bitnami/magento/htdocs/app/code/
+            else
+                cp -R /source/* /opt/bitnami/magento/htdocs/app/code/
+            fi
         fi
     fi
     chown -R bitnami:daemon /opt/bitnami/magento/htdocs
