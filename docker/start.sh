@@ -188,11 +188,9 @@ if [ ! -f "/setup_complete" ]; then
 
 else
 
-    # Update URL
-    # sleep 30s
-    # php /opt/bitnami/magento/htdocs/bin/magento config:set web/unsecure/base_url "http://${MAGENTO_HOST}/"
-    # php /opt/bitnami/magento/htdocs/bin/magento config:set web/secure/base_url "https://${MAGENTO_HOST}/"
-
+    # Flush Cache on startup
+    sleep 30s
+    php /opt/bitnami/magento/htdocs/bin/magento cache:flush
 
     # Keep script Running
     trap : TERM INT; (while true; do sleep 1m; done) & wait
