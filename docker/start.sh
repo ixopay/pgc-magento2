@@ -1,5 +1,10 @@
 #!/bin/bash
-# set -x
+set -euo pipefail
+
+error_exit() {
+    echo "$1" 1>&2
+	exit 127
+}
 
 fix_symlink() {
     unlink $1
@@ -35,27 +40,27 @@ if [ ! -f "/setup_complete" ]; then
     if [ "${BUILD_ARTIFACT}" != "undefined" ]; then
         if [ -f /dist/paymentgatewaycloud.zip ]; then
             echo -e "Using Supplied zip ${BUILD_ARTIFACT}"
-            ZIP_NAME=$(basename "${BUILD_ARTIFACT}")
+            ZIP_NAME=$(basename "${BUILD_ARTIFACT}") || error_exit "Failed to get ZIP Name"
             mkdir /tmp/source
             unzip /dist/paymentgatewaycloud.zip -d /tmp/source
             cp -R /tmp/source/* /opt/bitnami/magento/htdocs/app/code/
         else
-            echo "Faled to build!, there is no such file: ${BUILD_ARTIFACT}"
-            exit 1
+            error_exit "Faled to build!, there is no such file: ${BUILD_ARTIFACT}"
         fi
     else
         if [ ! -d "/source/.git" ] && [ ! -f  "/source/.git" ]; then
             echo -e "Checking out branch ${BRANCH} from ${REPOSITORY}"
-            git clone $REPOSITORY /tmp/paymentgatewaycloud
+            git clone $REPOSITORY /tmp/paymentgatewaycloud  || error_exit "Failed to clone Repository $REPOSITORY"
             cd /tmp/paymentgatewaycloud
-            git checkout $BRANCH
+            git checkout $BRANCH || error_exit "Failed to checkout $BRANCH"
             if [ ! -z "${WHITELABEL}" ]; then
                 echo -e "Whitelabeling for Magento not Supported yet!"
                 cp -R /tmp/paymentgatewaycloud/* /opt/bitnami/magento/htdocs/app/code/
                 #echo -e "Running Whitelabel Script for ${WHITELABEL}"
+                #echo "y" | php build.php "gateway.mypaymentprovider.com" "${WHITELABEL}" || error_exit "Failed to run Whitelabel Script for '$WHITELABEL'"
                 #DEST_FILE="$(echo "y" | php build.php "gateway.mypaymentprovider.com" "${WHITELABEL}" | tail -n 1 | sed 's/.*Created file "\(.*\)".*/\1/g')"
-                #DB_FIELD_NAME="$(php /whitelabel.php snakeCase "${WHITELABEL}")"
-                #unzip "${DEST_FILE}" -d /tmp/source
+                #DB_FIELD_NAME="$(php /whitelabel.php snakeCase "${WHITELABEL}")" || error_exit "Failed to extract DB-Field Name"
+                #unzip "${DEST_FILE}" -d /tmp/source || error_exit "Failed to extract ZIP"
                 #cp -R /tmp/source/* /opt/bitnami/magento/htdocs/app/code/
             else
                 cp -R /tmp/paymentgatewaycloud/* /opt/bitnami/magento/htdocs/app/code/
@@ -67,9 +72,10 @@ if [ ! -f "/setup_complete" ]; then
                 echo -e "Whitelabeling for Magento not Supported yet!"
                 cp -R /source/* /opt/bitnami/magento/htdocs/app/code/
                 #echo -e "Running Whitelabel Script for ${WHITELABEL}"
+                #echo "y" | php build.php "gateway.mypaymentprovider.com" "${WHITELABEL}" || error_exit "Failed to run Whitelabel Script for '$WHITELABEL'"
                 #DEST_FILE="$(echo "y" | php build.php "gateway.mypaymentprovider.com" "${WHITELABEL}" | tail -n 1 | sed 's/.*Created file "\(.*\)".*/\1/g')"
-                #DB_FIELD_NAME="$(php /whitelabel.php snakeCase "${WHITELABEL}")"
-                #unzip "${DEST_FILE}" -d /tmp/source
+                #DB_FIELD_NAME="$(php /whitelabel.php snakeCase "${WHITELABEL}")" || error_exit "Failed to extract DB-Field Name"
+                #unzip "${DEST_FILE}" -d /tmp/source || error_exit "Failed to extract ZIP"
                 #cp -R /tmp/source/* /opt/bitnami/magento/htdocs/app/code/
             else
                 cp -R /source/* /opt/bitnami/magento/htdocs/app/code/
@@ -79,24 +85,24 @@ if [ ! -f "/setup_complete" ]; then
     chown -R bitnami:daemon /opt/bitnami/magento/htdocs
 
     rm -rf /opt/bitnami/magento/htdocs/generated/code/Magento
-    php /opt/bitnami/magento/htdocs/bin/magento module:enable Pgc_Pgc --clear-static-content
-    php /opt/bitnami/magento/htdocs/bin/magento setup:di:compile
+    php /opt/bitnami/magento/htdocs/bin/magento module:enable Pgc_Pgc --clear-static-content || error_exit "Failed to enable Extension"
+    php /opt/bitnami/magento/htdocs/bin/magento setup:di:compile || error_exit "Failed to compile Magento Classes"
 
     echo -e "Import Products"
 
     if [ ! -d "/magento2-sample-data" ]; then
         echo -e "Checking out branch 2.3.3 from https://github.com/magento/magento2-sample-data"
-        git clone https://github.com/magento/magento2-sample-data /magento2-sample-data
+        git clone https://github.com/magento/magento2-sample-data /magento2-sample-data || error_exit "Failed to clone sample data"
         cd /magento2-sample-data
-        git checkout 2.3.3
-        php -f /magento2-sample-data/dev/tools/build-sample-data.php -- --ce-source="/opt/bitnami/magento/htdocs/"
+        git checkout 2.3.3 || error_exit "Failed to checkout sample data Branch"
+        php -f /magento2-sample-data/dev/tools/build-sample-data.php -- --ce-source="/opt/bitnami/magento/htdocs/" || error_exit "Failed to install sample data"
     fi
 
     # Rebuild cache and classes
     chown -R bitnami:daemon /magento2-sample-data/pub/media/catalog
-    php /opt/bitnami/magento/htdocs/bin/magento setup:upgrade
+    php /opt/bitnami/magento/htdocs/bin/magento setup:upgrade || error_exit "Failed to perform Magento Upgrade"
     #php /opt/bitnami/magento/htdocs/bin/magento setup:di:compile
-    php /opt/bitnami/magento/htdocs/bin/magento cache:flush
+    php /opt/bitnami/magento/htdocs/bin/magento cache:flush || error_exit "Failed to flush Cache"
 
     echo -e "Configuring Magento"
 
@@ -144,7 +150,7 @@ if [ ! -f "/setup_complete" ]; then
         php /opt/bitnami/magento/htdocs/bin/magento config:set web/secure/use_in_adminhtml 0
     fi
 
-    php /opt/bitnami/magento/htdocs/bin/magento cache:flush
+    php /opt/bitnami/magento/htdocs/bin/magento cache:flush || error_exit "Failed to flush Cache"
 
     chown -R bitnami:daemon /opt/bitnami/magento/htdocs
     chmod -R 775 /opt/bitnami/magento/htdocs
