@@ -143,7 +143,7 @@ if [ ! -f "/setup_complete" ]; then
     # Enable PGC Payment Providers
     if [ $SHOP_PGC_URL ]; then
         php /opt/bitnami/magento/htdocs/bin/magento config:set pgc/general/username "$SHOP_PGC_USER"
-        php /opt/bitnami/magento/htdocs/bin/magento config:set pgc/general/password "$SHOP_PGC_PASSWORD"
+        php /opt/bitnami/magento/htdocs/bin/magento config:set pgc/general/password "${SHOP_PGC_PASSWORD//\\\"/\\"}"
         php /opt/bitnami/magento/htdocs/bin/magento config:set pgc/general/host "$SHOP_PGC_URL"
 
         php /opt/bitnami/magento/htdocs/bin/magento config:set payment/pgc_creditcard/active 1
