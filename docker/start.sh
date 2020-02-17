@@ -6,11 +6,29 @@ error_exit() {
 	exit 1
 }
 
+fix_permissions() {
+    find /opt/bitnami/magento/htdocs -type f -exec chmod 644 {} \;
+    find /opt/bitnami/magento/htdocs -type d -exec chmod 755 {} \;
+    find /opt/bitnami/magento/htdocs/var -type d -exec chmod 777 {} \;
+    find /opt/bitnami/magento/htdocs/pub/media -type d -exec chmod 777 {} \;
+    find /opt/bitnami/magento/htdocs/pub/static -type d -exec chmod 777 {} \;
+    chmod 777 /opt/bitnami/magento/htdocs/app/etc
+    chmod 644 /opt/bitnami/magento/htdocs/app/etc/*.xml
+}
+
 fix_symlink() {
     unlink $1
+    rm -rf $1
     mkdir $1
-    cp -rf $2/* $1/
-    cp -rf $2/.* $1/
+    cp -rfLH $2/* $1/
+    chown -R bitnami:daemon $1
+}
+
+fix_symlink_no_cp() {
+    unlink $1
+    rm -rf $1
+    mkdir $1
+    #cp -rfLH $2/* $1/
     chown -R bitnami:daemon $1
 }
 
@@ -31,7 +49,7 @@ if [ ! -f "/setup_complete" ]; then
     fix_symlink /opt/bitnami/magento/htdocs/pub/media /bitnami/magento/htdocs/pub/media
     fix_symlink /opt/bitnami/magento/htdocs/app/etc /bitnami/magento/htdocs/app/etc
     fix_symlink /opt/bitnami/magento/htdocs/app/design /bitnami/magento/htdocs/app/design
-    fix_symlink /opt/bitnami/magento/htdocs/app/code /bitnami/magento/htdocs/app/code
+    fix_symlink_no_cp /opt/bitnami/magento/htdocs/app/code /bitnami/magento/htdocs/app/code
 
     echo -e "Installing PGC Extension"
 
@@ -85,6 +103,12 @@ if [ ! -f "/setup_complete" ]; then
     chown -R bitnami:daemon /opt/bitnami/magento/htdocs
 
     rm -rf /opt/bitnami/magento/htdocs/generated/code/Magento
+    
+    chown -R bitnami:daemon /opt/bitnami/magento/htdocs
+    chmod -R 775 /opt/bitnami/magento/htdocs
+    chmod -R 777 /opt/bitnami/magento/htdocs/pub/media
+    fix_permissions
+
     php /opt/bitnami/magento/htdocs/bin/magento module:enable Pgc_Pgc --clear-static-content || error_exit "Failed to enable Extension"
     php /opt/bitnami/magento/htdocs/bin/magento setup:di:compile || error_exit "Failed to compile Magento Classes"
 
