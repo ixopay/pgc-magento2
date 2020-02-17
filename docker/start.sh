@@ -19,17 +19,9 @@ fix_permissions() {
 fix_symlink() {
     unlink $1
     rm -rf $1
-    mkdir $1
-    cp -rfLH $2/* $1/
+    cp -rfLH $2 $1 || :
     chown -R bitnami:daemon $1
-}
-
-fix_symlink_no_cp() {
-    unlink $1
-    rm -rf $1
-    mkdir $1
-    #cp -rfLH $2/* $1/
-    chown -R bitnami:daemon $1
+    chmod -R 775 $1
 }
 
 echo -e "Starting Magento"
@@ -49,7 +41,7 @@ if [ ! -f "/setup_complete" ]; then
     fix_symlink /opt/bitnami/magento/htdocs/pub/media /bitnami/magento/htdocs/pub/media
     fix_symlink /opt/bitnami/magento/htdocs/app/etc /bitnami/magento/htdocs/app/etc
     fix_symlink /opt/bitnami/magento/htdocs/app/design /bitnami/magento/htdocs/app/design
-    fix_symlink_no_cp /opt/bitnami/magento/htdocs/app/code /bitnami/magento/htdocs/app/code
+    fix_symlink /opt/bitnami/magento/htdocs/app/code /bitnami/magento/htdocs/app/code
 
     echo -e "Installing PGC Extension"
 
@@ -159,7 +151,7 @@ if [ ! -f "/setup_complete" ]; then
         php /opt/bitnami/magento/htdocs/bin/magento config:set payment/pgc_creditcard/shared_secret "$SHOP_PGC_SECRET"
         php /opt/bitnami/magento/htdocs/bin/magento config:set payment/pgc_creditcard/integration_key "$SHOP_PGC_INTEGRATION_KEY"
         php /opt/bitnami/magento/htdocs/bin/magento config:set payment/pgc_creditcard/sort_order 1
-        php /opt/bitnami/magento/htdocs/bin/magento config:set payment/pgc_creditcard/seamless "$SHOP_PGC_SEAMLESS"
+        php /opt/bitnami/magento/htdocs/bin/magento config:set payment/pgc_creditcard/seamless "$SHOP_PGC_SEAMLESS" || :
     fi
 
     # Where to use https per default
@@ -173,6 +165,8 @@ if [ ! -f "/setup_complete" ]; then
         php /opt/bitnami/magento/htdocs/bin/magento config:set web/secure/base_url "http://${MAGENTO_HOST}/"
         php /opt/bitnami/magento/htdocs/bin/magento config:set web/secure/use_in_adminhtml 0
     fi
+
+    echo -e "Flushing Cache"
 
     php /opt/bitnami/magento/htdocs/bin/magento cache:flush || error_exit "Failed to flush Cache"
 
