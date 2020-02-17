@@ -3,7 +3,7 @@ set -euo pipefail
 
 error_exit() {
     echo "$1" 1>&2
-	exit 127
+	exit 1
 }
 
 fix_symlink() {
@@ -162,7 +162,7 @@ if [ ! -f "/setup_complete" ]; then
     echo -e "Setup Complete! You can access the instance at: ${MAGENTO_HOST}"
     
     if [ $PRECONFIGURE ]; then
-        kill 1
+        exit 0
     else
         # Keep script Running
         trap : TERM INT; (while true; do sleep 1m; done) & wait
