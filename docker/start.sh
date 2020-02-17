@@ -9,8 +9,8 @@ error_exit() {
 fix_symlink() {
     unlink $1
     mkdir $1
-    cp -r $2/* $1/
-    cp -r $2/.* $1/
+    cp -rf $2/* $1/
+    cp -rf $2/.* $1/
     chown -R bitnami:daemon $1
 }
 
