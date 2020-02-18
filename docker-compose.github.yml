@@ -52,7 +52,7 @@ services:
       - SHOP_PGC_API_KEY=${SHOP_PGC_API_KEY:-key}
       - SHOP_PGC_SECRET=${SHOP_PGC_SECRET:-secret}
       - SHOP_PGC_INTEGRATION_KEY=${SHOP_PGC_INTEGRATION_KEY:-int_key}
-      - SHOP_PGC_SEAMLESS=${SHOP_PGC_SEAMLESS:-0}
+      - SHOP_PGC_SEAMLESS=${SHOP_PGC_SEAMLESS:-1}
       - REPOSITORY=${REPOSITORY:-https://github.com/user/repo}
       - BRANCH=${BRANCH:-master}
       - BUILD_ARTIFACT=${BUILD_ARTIFACT:-undefined}

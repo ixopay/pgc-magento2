@@ -1,4 +1,4 @@
-FROM bitnami/magento:2
+FROM bitnami/magento:2.3.1
 
 EXPOSE 80
 
@@ -17,6 +17,7 @@ ENV PRECONFIGURE="" \
     SHOP_PGC_SEAMLESS="1" \
     SHOP_PGC_INTEGRATION_KEY="intkey" \
     REPOSITORY="https://github.com/user/repo" \
+    NAMI_DEBUG='--log-level=trace8' \
     BRANCH="master"
 
 RUN apt-get update && apt-get install --no-install-recommends -y \

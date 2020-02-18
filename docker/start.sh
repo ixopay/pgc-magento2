@@ -40,8 +40,8 @@ if [ ! -f "/setup_complete" ]; then
     fix_symlink /opt/bitnami/magento/htdocs/pub/static /bitnami/magento/htdocs/pub/static
     fix_symlink /opt/bitnami/magento/htdocs/pub/media /bitnami/magento/htdocs/pub/media
     fix_symlink /opt/bitnami/magento/htdocs/app/etc /bitnami/magento/htdocs/app/etc
-    fix_symlink /opt/bitnami/magento/htdocs/app/design /bitnami/magento/htdocs/app/design
-    fix_symlink /opt/bitnami/magento/htdocs/app/code /bitnami/magento/htdocs/app/code
+    fix_symlink /opt/bitnami/magento/htdocs/app/design /bitnami/magento/htdocs/app/design || :
+    fix_symlink /opt/bitnami/magento/htdocs/app/code /bitnami/magento/htdocs/app/code || :
 
     echo -e "Installing PGC Extension"
 
@@ -143,7 +143,7 @@ if [ ! -f "/setup_complete" ]; then
     # Enable PGC Payment Providers
     if [ $SHOP_PGC_URL ]; then
         php /opt/bitnami/magento/htdocs/bin/magento config:set pgc/general/username "$SHOP_PGC_USER"
-        php /opt/bitnami/magento/htdocs/bin/magento config:set pgc/general/password "${SHOP_PGC_PASSWORD//\\\"/\"}"
+        php /opt/bitnami/magento/htdocs/bin/magento config:set pgc/general/password "${SHOP_PGC_PASSWORD}"
         php /opt/bitnami/magento/htdocs/bin/magento config:set pgc/general/host "$SHOP_PGC_URL"
 
         php /opt/bitnami/magento/htdocs/bin/magento config:set payment/pgc_creditcard/active 1
