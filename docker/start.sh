@@ -157,7 +157,7 @@ if [ ! -f "/setup_complete" ]; then
     if [ $DEMO_CUSTOMER_PASSWORD ]; then
         echo -e "Creating Demo Customer"
         # Create Customer Entity
-        DEMO_USER_ID=$(mysql -B -h mariadb -u root bitnami_magento -e "INSERT INTO \`customer_entity\` (website_id, gender, dob, email, group_id, store_id, created_at, updated_at, is_active, created_in, firstname, lastname, password_hash, rp_token, rp_token_created_at, failures_num) VALUES (1, 1, '1991-11-05', 'RobertZJohnson@einrot.com', 1, 1, NOW(), NOW(), 1, 'Default Store View', 'Johnson', 'Robert Z.', MD5('${DEMO_CUSTOMER_PASSWORD}'), '', NOW(), 0); SELECT LAST_INSERT_ID();" | tail -n1)
+        DEMO_USER_ID=$(mysql -B -h mariadb -u root bitnami_magento -e "INSERT INTO \`customer_entity\` (website_id, gender, dob, email, group_id, store_id, created_at, updated_at, is_active, created_in, firstname, lastname, password_hash, rp_token, rp_token_created_at, failures_num) VALUES (1, 1, '1991-11-05', 'RobertZJohnson@einrot.com', 1, 1, NOW(), NOW(), 1, 'Default Store View', 'Johnson', 'Robert Z.', CONCAT(SHA2('xxxxxxxx${DEMO_CUSTOMER_PASSWORD}', 256), ':xxxxxxxx:1'), '', NOW(), 0); SELECT LAST_INSERT_ID();" | tail -n1)
 
         # Create Address Entity
         DEMO_ADDRESS_ID=$(mysql -B -h mariadb -u root bitnami_magento -e "INSERT INTO \`customer_address_entity\` (parent_id, created_at, updated_at, is_active, city, company, country_id, firstname, lastname, postcode, region, region_id, street, telephone) VALUES (${DEMO_USER_ID}, NOW(), NOW(), 1, 'Springfield', 'Ixolit', 'US', 'Johnson', 'Robert Z.', 62703, 'Illinois', 23, '242 University Hill Road', '217-585-5994'); SELECT LAST_INSERT_ID();" | tail -n1)
