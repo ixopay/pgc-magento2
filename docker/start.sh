@@ -154,6 +154,21 @@ if [ ! -f "/setup_complete" ]; then
         php /opt/bitnami/magento/htdocs/bin/magento config:set payment/pgc_creditcard/seamless "$SHOP_PGC_SEAMLESS" || :
     fi
 
+    if [ $DEMO_CUSTOMER_PASSWORD ]; then
+        echo -e "Creating Demo Customer"
+        # Create Customer Entity
+        DEMO_USER_ID=$(mysql -B -h mariadb -u root bitnami_magento -e "INSERT INTO \`customer_entity\` (website_id, gender, dob, email, group_id, store_id, created_at, updated_at, is_active, created_in, firstname, lastname, password_hash, rp_token, rp_token_created_at, failures_num) VALUES (1, 1, '1991-11-05', 'RobertZJohnson@einrot.com', 1, 1, NOW(), NOW(), 1, 'Default Store View', 'Johnson', 'Robert Z.', MD5('${DEMO_CUSTOMER_PASSWORD}'), '', NOW(), 0); SELECT LAST_INSERT_ID();" | tail -n1)
+
+        # Create Address Entity
+        DEMO_ADDRESS_ID=$(mysql -B -h mariadb -u root bitnami_magento -e "INSERT INTO \`customer_address_entity\` (parent_id, created_at, updated_at, is_active, city, company, country_id, firstname, lastname, postcode, region, region_id, street, telephone) VALUES (${DEMO_USER_ID}, NOW(), NOW(), 1, 'Springfield', 'Ixolit', 'US', 'Johnson', 'Robert Z.', 62703, 'Illinois', 23, '242 University Hill Road', '217-585-5994'); SELECT LAST_INSERT_ID();" | tail -n1)
+
+        # Update Address of Customer
+        mysql -B -h mariadb -u root bitnami_magento -e "UPDATE \`customer_entity\` SET default_billing=${DEMO_ADDRESS_ID}, default_shipping=${DEMO_ADDRESS_ID} WHERE entity_id = ${DEMO_USER_ID};"
+
+        # Tell Magento about the new Customer
+        mysql -B -h mariadb -u root bitnami_magento -e "INSERT INTO \`customer_grid_flat\` (entity_id, name, email, group_id, created_at, website_id, confirmation, created_in, dob, gender, taxvat, lock_expires, shipping_full, billing_full, billing_firstname, billing_lastname, billing_telephone, billing_postcode, billing_country_id, billing_region, billing_street, billing_city, billing_fax, billing_vat_id, billing_company) VALUES (${DEMO_USER_ID}, 'Robert Z. Johnson', 'RobertZJohnson@einrot.com', '1', NOW(), '1', NULL, 'Default Store View', '1991-11-05', 1, NULL, NULL, '242 University Hill Road Springfield Illinois 62703', '242 University Hill Road Springfield Illinois 62703', 'Robert Z.', 'Johnson', '217-585-5994', '62703', 'US', 'Illinois', '242 University Hill Road', 'Springfield', NULL, NULL, NULL) ON DUPLICATE KEY UPDATE \`name\` = VALUES(\`name\`), \`email\` = VALUES(\`email\`), \`group_id\` = VALUES(\`group_id\`), \`created_at\` = VALUES(\`created_at\`), \`website_id\` = VALUES(\`website_id\`), \`confirmation\` = VALUES(\`confirmation\`), \`created_in\` = VALUES(\`created_in\`), \`dob\` = VALUES(\`dob\`), \`gender\` = VALUES(\`gender\`), \`taxvat\` = VALUES(\`taxvat\`), \`lock_expires\` = VALUES(\`lock_expires\`), \`shipping_full\` = VALUES(\`shipping_full\`), \`billing_full\` = VALUES(\`billing_full\`), \`billing_firstname\` = VALUES(\`billing_firstname\`), \`billing_lastname\` = VALUES(\`billing_lastname\`), \`billing_telephone\` = VALUES(\`billing_telephone\`), \`billing_postcode\` = VALUES(\`billing_postcode\`), \`billing_country_id\` = VALUES(\`billing_country_id\`), \`billing_region\` = VALUES(\`billing_region\`), \`billing_street\` = VALUES(\`billing_street\`), \`billing_city\` = VALUES(\`billing_city\`), \`billing_fax\` = VALUES(\`billing_fax\`), \`billing_vat_id\` = VALUES(\`billing_vat_id\`), \`billing_company\` = VALUES(\`billing_company\`)"
+    fi
+
     # Where to use https per default
     php /opt/bitnami/magento/htdocs/bin/magento config:set web/secure/use_in_frontend 0
     if [ $PRECONFIGURE ]; then
