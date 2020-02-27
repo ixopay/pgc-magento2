@@ -198,10 +198,42 @@ if [ ! -f "/setup_complete" ]; then
         exit 0
     else
         # Keep script Running
+        if [ $OPENCART_HOST ]; then
+            echo -e "Updating Shop URL to: ${OPENCART_HOST}"
+            # Update Hostname
+            php /opt/bitnami/magento/htdocs/bin/magento config:set web/unsecure/base_url "http://${MAGENTO_HOST}/"
+            php /opt/bitnami/magento/htdocs/bin/magento config:set web/secure/base_url "http://${MAGENTO_HOST}/"
+            if [[ "${SCHEMA}" == "https" ]]; then
+                php /opt/bitnami/magento/htdocs/bin/magento config:set web/unsecure/base_url "https://${MAGENTO_HOST}/"
+                php /opt/bitnami/magento/htdocs/bin/magento config:set web/secure/base_url "https://${MAGENTO_HOST}/"
+                php /opt/bitnami/magento/htdocs/bin/magento config:set web/secure/use_in_frontend 1
+                php /opt/bitnami/magento/htdocs/bin/magento config:set web/secure/use_in_adminhtml 1
+            else
+                php /opt/bitnami/magento/htdocs/bin/magento config:set web/secure/use_in_frontend 0
+                php /opt/bitnami/magento/htdocs/bin/magento config:set web/secure/use_in_adminhtml 0
+            fi
+        fi
+
         trap : TERM INT; (while true; do sleep 1m; done) & wait
     fi
 
 else
+
+    if [ $OPENCART_HOST ]; then
+        echo -e "Updating Shop URL to: ${OPENCART_HOST}"
+        # Update Hostname
+        php /opt/bitnami/magento/htdocs/bin/magento config:set web/unsecure/base_url "http://${MAGENTO_HOST}/"
+        php /opt/bitnami/magento/htdocs/bin/magento config:set web/secure/base_url "http://${MAGENTO_HOST}/"
+        if [[ "${SCHEMA}" == "https" ]]; then
+            php /opt/bitnami/magento/htdocs/bin/magento config:set web/unsecure/base_url "https://${MAGENTO_HOST}/"
+            php /opt/bitnami/magento/htdocs/bin/magento config:set web/secure/base_url "https://${MAGENTO_HOST}/"
+            php /opt/bitnami/magento/htdocs/bin/magento config:set web/secure/use_in_frontend 1
+            php /opt/bitnami/magento/htdocs/bin/magento config:set web/secure/use_in_adminhtml 1
+        else
+            php /opt/bitnami/magento/htdocs/bin/magento config:set web/secure/use_in_frontend 0
+            php /opt/bitnami/magento/htdocs/bin/magento config:set web/secure/use_in_adminhtml 0
+        fi
+    fi
 
     # Flush Cache on startup
     sleep 30s

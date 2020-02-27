@@ -8,6 +8,7 @@ VOLUME /dist
 
 ENV PRECONFIGURE="" \
     WHITELABEL="" \
+    SCHEMA="" \
     DEMO_CUSTOMER_PASSWORD="customer" \
     BUILD_ARTIFACT="undefined" \
     SHOP_PGC_URL="sandbox" \

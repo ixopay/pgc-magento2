@@ -18,6 +18,7 @@ services:
       - mariadb
       - elasticsearch
     environment:
+      - SCHEMA=http
       - ALLOW_EMPTY_PASSWORD=${ALLOW_EMPTY_PASSWORD:-yes}
       - WHITELABEL=${WHITELABEL:-}
       - BITNAMI_APP_NAME=${BITNAMI_APP_NAME:-magento}

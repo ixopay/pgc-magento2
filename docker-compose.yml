@@ -19,6 +19,7 @@ services:
       - '80:80'
       - '443:443'
     environment:
+      - SCHEMA=http
       - ALLOW_EMPTY_PASSWORD=${ALLOW_EMPTY_PASSWORD:-yes}
       - WHITELABEL=${WHITELABEL:-}
       - BITNAMI_APP_NAME=${BITNAMI_APP_NAME:-magento}
