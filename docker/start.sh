@@ -198,8 +198,8 @@ if [ ! -f "/setup_complete" ]; then
         exit 0
     else
         # Keep script Running
-        if [ $OPENCART_HOST ]; then
-            echo -e "Updating Shop URL to: ${OPENCART_HOST}"
+        if [ $MAGENTO_HOST ]; then
+            echo -e "Updating Shop URL to: ${MAGENTO_HOST}"
             # Update Hostname
             php /opt/bitnami/magento/htdocs/bin/magento config:set web/unsecure/base_url "http://${MAGENTO_HOST}/"
             php /opt/bitnami/magento/htdocs/bin/magento config:set web/secure/base_url "http://${MAGENTO_HOST}/"
@@ -219,8 +219,8 @@ if [ ! -f "/setup_complete" ]; then
 
 else
 
-    if [ $OPENCART_HOST ]; then
-        echo -e "Updating Shop URL to: ${OPENCART_HOST}"
+    if [ $MAGENTO_HOST ]; then
+        echo -e "Updating Shop URL to: ${MAGENTO_HOST}"
         # Update Hostname
         php /opt/bitnami/magento/htdocs/bin/magento config:set web/unsecure/base_url "http://${MAGENTO_HOST}/"
         php /opt/bitnami/magento/htdocs/bin/magento config:set web/secure/base_url "http://${MAGENTO_HOST}/"
