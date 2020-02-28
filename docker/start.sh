@@ -236,7 +236,6 @@ else
     fi
 
     # Flush Cache on startup
-    sleep 30s
     php /opt/bitnami/magento/htdocs/bin/magento cache:flush
 
     # Keep script Running
