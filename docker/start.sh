@@ -154,6 +154,10 @@ if [ ! -f "/setup_complete" ]; then
         php /opt/bitnami/magento/htdocs/bin/magento config:set payment/pgc_creditcard/seamless "$SHOP_PGC_SEAMLESS" || :
     fi
 
+    # Fix Transaction ID
+    UNIX_TIMESTAMP=$(date +'%s')
+    mysql -B -h mariadb -u root bitnami_magento -e "INSERT INTO \`sequence_order_1\` SET sequence_value = '${UNIX_TIMESTAMP}';"
+
     if [ $DEMO_CUSTOMER_PASSWORD ]; then
         echo -e "Creating Demo Customer"
         # Create Customer Entity
