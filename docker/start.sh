@@ -199,6 +199,19 @@ if [ ! -f "/setup_complete" ]; then
     echo -e "Setup Complete! You can access the instance at: ${MAGENTO_HOST}"
     
     if [ $PRECONFIGURE ]; then
+        # Disable Login Captcha
+        php /opt/bitnami/magento/htdocs/bin/magento config:set msp_securitysuite_recaptcha/backend/enabled 0
+        php /opt/bitnami/magento/htdocs/bin/magento config:set msp_securitysuite_recaptcha/frontend/enabled 0
+        php /opt/bitnami/magento/htdocs/bin/magento config:set admin/security/use_case_sensitive_login 0
+        php /opt/bitnami/magento/htdocs/bin/magento config:set admin/captcha/enable 0 
+        php /opt/bitnami/magento/htdocs/bin/magento config:set customer/online_customers/section_data_lifetime 60
+        php /opt/bitnami/magento/htdocs/bin/magento config:set customer/create_account/auto_group_assign 0
+        php /opt/bitnami/magento/htdocs/bin/magento config:set customer/create_account/viv_disable_auto_group_assign_default 0
+        php /opt/bitnami/magento/htdocs/bin/magento config:set customer/create_account/generate_human_friendly_id 0
+        php /opt/bitnami/magento/htdocs/bin/magento config:set customer/address/middlename_show 0
+        php /opt/bitnami/magento/htdocs/bin/magento config:set customer/address/telephone_show - req
+        php /opt/bitnami/magento/htdocs/bin/magento config:set customer/address/company_show - opt
+        php /opt/bitnami/magento/htdocs/bin/magento config:set customer/captcha/enable - 0
         exit 0
     else
         # Keep script Running
