@@ -209,9 +209,9 @@ if [ ! -f "/setup_complete" ]; then
         php /opt/bitnami/magento/htdocs/bin/magento config:set customer/create_account/viv_disable_auto_group_assign_default 0
         php /opt/bitnami/magento/htdocs/bin/magento config:set customer/create_account/generate_human_friendly_id 0
         php /opt/bitnami/magento/htdocs/bin/magento config:set customer/address/middlename_show 0
-        php /opt/bitnami/magento/htdocs/bin/magento config:set customer/address/telephone_show - req
-        php /opt/bitnami/magento/htdocs/bin/magento config:set customer/address/company_show - opt
-        php /opt/bitnami/magento/htdocs/bin/magento config:set customer/captcha/enable - 0
+        php /opt/bitnami/magento/htdocs/bin/magento config:set customer/address/telephone_show req
+        php /opt/bitnami/magento/htdocs/bin/magento config:set customer/address/company_show opt
+        php /opt/bitnami/magento/htdocs/bin/magento config:set customer/captcha/enable 0
         exit 0
     else
         # Keep script Running
