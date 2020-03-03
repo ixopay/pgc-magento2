@@ -252,6 +252,10 @@ else
         fi
     fi
 
+    # Fix Transaction ID
+    UNIX_TIMESTAMP=$(date +'%s')
+    mysql -B -h mariadb -u root bitnami_magento -e "INSERT INTO \`sequence_order_1\` SET sequence_value = '${UNIX_TIMESTAMP}';"
+
     # Flush Cache on startup
     php /opt/bitnami/magento/htdocs/bin/magento cache:flush
 
