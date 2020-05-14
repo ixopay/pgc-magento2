@@ -195,9 +195,7 @@ if [ ! -f "/setup_complete" ]; then
     chmod -R 777 /magento2-sample-data
 
     touch /setup_complete
-
-    echo -e "Setup Complete! You can access the instance at: ${MAGENTO_HOST}"
-    
+   
     if [ $PRECONFIGURE ]; then
         # Disable Login Captcha
         php /opt/bitnami/magento/htdocs/bin/magento config:set msp_securitysuite_recaptcha/backend/enabled 0
@@ -230,6 +228,10 @@ if [ ! -f "/setup_complete" ]; then
                 php /opt/bitnami/magento/htdocs/bin/magento config:set web/secure/use_in_adminhtml 0
             fi
         fi
+
+        php /opt/bitnami/magento/htdocs/bin/magento cache:flush || error_exit "Failed to flush Cache"
+
+        echo -e "Setup Complete! You can access the instance at: ${MAGENTO_HOST}"
 
         trap : TERM INT; (while true; do sleep 1m; done) & wait
     fi
