@@ -7,8 +7,8 @@ error_exit() {
 }
 
 fix_permissions() {
-    find /opt/bitnami/magento/htdocs -type f -exec chmod 644 {} \;
-    find /opt/bitnami/magento/htdocs -type d -exec chmod 755 {} \;
+    find /opt/bitnami/magento/htdocs -type f -not -path "/opt/bitnami/magento/htdocs/app/code/*" -exec chmod 644 {} \;
+    find /opt/bitnami/magento/htdocs -type d -not -path "/opt/bitnami/magento/htdocs/app/code/*" -exec chmod 755 {} \;
     find /opt/bitnami/magento/htdocs/var -type d -exec chmod 777 {} \;
     find /opt/bitnami/magento/htdocs/pub/media -type d -exec chmod 777 {} \;
     find /opt/bitnami/magento/htdocs/pub/static -type d -exec chmod 777 {} \;
@@ -41,7 +41,7 @@ if [ ! -f "/setup_complete" ]; then
     fix_symlink /opt/bitnami/magento/htdocs/pub/media /bitnami/magento/htdocs/pub/media
     fix_symlink /opt/bitnami/magento/htdocs/app/etc /bitnami/magento/htdocs/app/etc
     fix_symlink /opt/bitnami/magento/htdocs/app/design /bitnami/magento/htdocs/app/design || :
-    fix_symlink /opt/bitnami/magento/htdocs/app/code /bitnami/magento/htdocs/app/code || :
+    #fix_symlink /opt/bitnami/magento/htdocs/app/code /bitnami/magento/htdocs/app/code || :
 
     echo -e "Installing PGC Extension"
 
@@ -49,6 +49,7 @@ if [ ! -f "/setup_complete" ]; then
     mkdir -p /opt/bitnami/magento/htdocs/app/code/
     if [ "${BUILD_ARTIFACT}" != "undefined" ]; then
         if [ -f /dist/paymentgatewaycloud.zip ]; then
+            fix_symlink /opt/bitnami/magento/htdocs/app/code /bitnami/magento/htdocs/app/code || :
             echo -e "Using Supplied zip ${BUILD_ARTIFACT}"
             ZIP_NAME=$(basename "${BUILD_ARTIFACT}") || error_exit "Failed to get ZIP Name"
             mkdir /tmp/source
@@ -58,7 +59,8 @@ if [ ! -f "/setup_complete" ]; then
             error_exit "Faled to build!, there is no such file: ${BUILD_ARTIFACT}"
         fi
     else
-        if [ ! -d "/source/.git" ] && [ ! -f  "/source/.git" ]; then
+        if [ ! -d "/opt/bitnami/magento/htdocs/app/code/Pgc" ] && [ ! -f  "/opt/bitnami/magento/htdocs/app/code/Pgc" ]; then
+            fix_symlink /opt/bitnami/magento/htdocs/app/code /bitnami/magento/htdocs/app/code || :
             echo -e "Checking out branch ${BRANCH} from ${REPOSITORY}"
             git clone $REPOSITORY /tmp/paymentgatewaycloud  || error_exit "Failed to clone Repository $REPOSITORY"
             cd /tmp/paymentgatewaycloud
@@ -77,10 +79,8 @@ if [ ! -f "/setup_complete" ]; then
             fi
         else
             echo -e "Using Development Source!"
-            cd /source/
             if [ ! -z "${WHITELABEL}" ]; then
                 echo -e "Whitelabeling for Magento not Supported yet!"
-                cp -R /source/* /opt/bitnami/magento/htdocs/app/code/
                 #echo -e "Running Whitelabel Script for ${WHITELABEL}"
                 #echo "y" | php build.php "gateway.mypaymentprovider.com" "${WHITELABEL}" || error_exit "Failed to run Whitelabel Script for '$WHITELABEL'"
                 #DEST_FILE="$(echo "y" | php build.php "gateway.mypaymentprovider.com" "${WHITELABEL}" | tail -n 1 | sed 's/.*Created file "\(.*\)".*/\1/g')"
@@ -88,7 +88,7 @@ if [ ! -f "/setup_complete" ]; then
                 #unzip "${DEST_FILE}" -d /tmp/source || error_exit "Failed to extract ZIP"
                 #cp -R /tmp/source/* /opt/bitnami/magento/htdocs/app/code/
             else
-                cp -R /source/* /opt/bitnami/magento/htdocs/app/code/
+                echo -e "Nothing to do."
             fi
         fi
     fi
@@ -96,8 +96,6 @@ if [ ! -f "/setup_complete" ]; then
 
     rm -rf /opt/bitnami/magento/htdocs/generated/code/Magento
     
-    chown -R bitnami:daemon /opt/bitnami/magento/htdocs
-    chmod -R 775 /opt/bitnami/magento/htdocs
     chmod -R 777 /opt/bitnami/magento/htdocs/pub/media
     fix_permissions
 
@@ -189,9 +187,11 @@ if [ ! -f "/setup_complete" ]; then
 
     php /opt/bitnami/magento/htdocs/bin/magento cache:flush || error_exit "Failed to flush Cache"
 
-    chown -R bitnami:daemon /opt/bitnami/magento/htdocs
-    chmod -R 775 /opt/bitnami/magento/htdocs
-    chmod -R 777 /opt/bitnami/magento/htdocs/pub/media
+    find /opt/bitnami/magento/htdocs -type f -not -path "/opt/bitnami/magento/htdocs/app/code/*" -exec chown -R bitnami:daemon {} \;
+    find /opt/bitnami/magento/htdocs -type d -not -path "/opt/bitnami/magento/htdocs/app/code/*" -exec chmod 755 {} \;
+    chmod -R 777 /opt/bitnami/magento/htdocs/generated
+    chmod -R 777 /opt/bitnami/magento/htdocs/var
+    chmod -R 777 /opt/bitnami/magento/htdocs/pub
     chmod -R 777 /magento2-sample-data
 
     touch /setup_complete

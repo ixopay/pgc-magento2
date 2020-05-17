@@ -16,7 +16,7 @@ To quickly spawn a Magento test shop with a plugin tagged at our Github reposito
 Clone our plugin repository and run the following command from the plugin root directory:
 
 ```bash
- # MAGENTO_PASSWORD must conatin a numeral consist of 8+ chars
+ # MAGENTO_PASSWORD must contain a number and hast to be at least 8 chars long
  REPOSITORY="https://github.com/ixopay/pgc-magento2" \
  BRANCH="master" \
  MAGENTO_HOST="127.0.0.1" \
@@ -28,7 +28,7 @@ Clone our plugin repository and run the following command from the plugin root d
 To develop and test plugin changes, you can run the following docker-compose command from the plugin root directory, to start a Magento shop & initialize a database with a bind mounted version of the plugin. The shop will be accessible via: `http://127.0.0.1/admin`.
 
 ```bash
- # MAGENTO_PASSWORD must conatin a numeral consist of 8+ chars
+ # MAGENTO_PASSWORD must contain a number and hast to be at least 8 chars long
  BITNAMI_IMAGE_VERSION="latest" \
  MAGENTO_HOST="127.0.0.1" \
  MAGENTO_USERNAME="dev" \
@@ -36,10 +36,18 @@ To develop and test plugin changes, you can run the following docker-compose com
   docker-compose up --build --force-recreate --renew-anon-volumes
 ```
 
+With this setup your source coude is linked into the container, you should be able to see source changes directly in the running instance.
+If you oerformed drastical changes it might be required to flush the cache to apply the changes, you can do this with folloging command:
+
+```bash
+docker-compose exec magento /opt/bitnami/php/bin/php /opt/bitnami/magento/htdocs/bin/magento cache:flush
+```
+
+
 To test a build you generated via build.php run the following command from the plugin root directory:
 
 ```bash
- # MAGENTO_PASSWORD must conatin a numeral consist of 8+ chars
+ # MAGENTO_PASSWORD must contain a number and hast to be at least 8 chars long
  php build.php sandbox.paymentgateway.cloud "My Payment Provider"
  BITNAMI_IMAGE_VERSION="latest" \
  BUILD_ARTIFACT="${PWD}/dist/magento2-my-payment-provider-1.0.0.zip" \

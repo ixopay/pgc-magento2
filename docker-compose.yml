@@ -13,7 +13,7 @@ services:
   magento:
     build: 'docker/'
     volumes:
-      - '.:/source'
+      - './Pgc:/opt/bitnami/magento/htdocs/app/code/Pgc'
       - '${BUILD_ARTIFACT:-undefined}:/dist/paymentgatewaycloud.zip'
     ports:
       - '80:80'
