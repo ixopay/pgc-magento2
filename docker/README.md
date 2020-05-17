@@ -37,10 +37,10 @@ To develop and test plugin changes, you can run the following docker-compose com
 ```
 
 With this setup your source coude is linked into the container, you should be able to see source changes directly in the running instance.
-If you oerformed drastical changes it might be required to flush the cache to apply the changes, you can do this with folloging command:
+If you oerformed drastical changes it might be required to flush the cache and regenerate magento classes to apply the changes, you can do this with following command:
 
 ```bash
-docker-compose exec magento /opt/bitnami/php/bin/php /opt/bitnami/magento/htdocs/bin/magento cache:flush
+docker-compose exec --user bitnami magento /opt/bitnami/php/bin/php /opt/bitnami/magento/htdocs/bin/magento setup:upgrade
 ```
 
 
