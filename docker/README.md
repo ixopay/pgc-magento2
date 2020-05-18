@@ -20,6 +20,8 @@ Clone our plugin repository and run the following command from the plugin root d
  REPOSITORY="https://github.com/ixopay/pgc-magento2" \
  BRANCH="master" \
  MAGENTO_HOST="127.0.0.1" \
+ MAGENTO_HTTP="8081" \
+ MAGENTO_HTTPS="8443" \
  MAGENTO_USERNAME="dev" \
  MAGENTO_PASSWORD="develop1" \
   docker-compose -f docker-compose.github.yml up --build --force-recreate --renew-anon-volumes
@@ -31,6 +33,8 @@ To develop and test plugin changes, you can run the following docker-compose com
  # MAGENTO_PASSWORD must contain a number and hast to be at least 8 chars long
  BITNAMI_IMAGE_VERSION="latest" \
  MAGENTO_HOST="127.0.0.1" \
+ MAGENTO_HTTP="8081" \
+ MAGENTO_HTTPS="8443" \
  MAGENTO_USERNAME="dev" \
  MAGENTO_PASSWORD="develop1" \
   docker-compose up --build --force-recreate --renew-anon-volumes
