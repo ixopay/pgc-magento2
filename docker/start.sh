@@ -222,11 +222,11 @@ if [ ! -f "/setup_complete" ]; then
         if [ $MAGENTO_HOST ]; then
             echo -e "Updating Shop URL to: ${MAGENTO_HOST}"
             # Update Hostname
-            php /opt/bitnami/magento/htdocs/bin/magento config:set web/unsecure/base_url "http://${MAGENTO_HOST}/"
-            php /opt/bitnami/magento/htdocs/bin/magento config:set web/secure/base_url "http://${MAGENTO_HOST}/"
+            php /opt/bitnami/magento/htdocs/bin/magento config:set web/unsecure/base_url "http://${MAGENTO_HOST}:${MAGENTO_HTTP}/"
+            php /opt/bitnami/magento/htdocs/bin/magento config:set web/secure/base_url "http://${MAGENTO_HOST}:${MAGENTO_HTTP}/"
             if [[ "${SCHEMA}" == "https" ]]; then
-                php /opt/bitnami/magento/htdocs/bin/magento config:set web/unsecure/base_url "https://${MAGENTO_HOST}/"
-                php /opt/bitnami/magento/htdocs/bin/magento config:set web/secure/base_url "https://${MAGENTO_HOST}/"
+                php /opt/bitnami/magento/htdocs/bin/magento config:set web/unsecure/base_url "https://${MAGENTO_HOST}:${MAGENTO_HTTPS}/"
+                php /opt/bitnami/magento/htdocs/bin/magento config:set web/secure/base_url "https://${MAGENTO_HOST}:${MAGENTO_HTTPS}/"
                 php /opt/bitnami/magento/htdocs/bin/magento config:set web/secure/use_in_frontend 1
                 php /opt/bitnami/magento/htdocs/bin/magento config:set web/secure/use_in_adminhtml 1
             else
