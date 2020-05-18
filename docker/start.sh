@@ -50,6 +50,9 @@ if [ ! -f "/setup_complete" ]; then
     if [ "${BUILD_ARTIFACT}" != "undefined" ]; then
         if [ -f /dist/paymentgatewaycloud.zip ]; then
             fix_symlink /opt/bitnami/magento/htdocs/app/code /bitnami/magento/htdocs/app/code || :
+            if [ ! -d "/opt/bitnami/magento/htdocs/app/code" ]; then
+                mkdir /opt/bitnami/magento/htdocs/app/code
+            fi
             echo -e "Using Supplied zip ${BUILD_ARTIFACT}"
             ZIP_NAME=$(basename "${BUILD_ARTIFACT}") || error_exit "Failed to get ZIP Name"
             mkdir /tmp/source
@@ -61,6 +64,9 @@ if [ ! -f "/setup_complete" ]; then
     else
         if [ ! -d "/opt/bitnami/magento/htdocs/app/code/Pgc" ] && [ ! -f  "/opt/bitnami/magento/htdocs/app/code/Pgc" ]; then
             fix_symlink /opt/bitnami/magento/htdocs/app/code /bitnami/magento/htdocs/app/code || :
+            if [ ! -d "/opt/bitnami/magento/htdocs/app/code" ]; then
+                mkdir /opt/bitnami/magento/htdocs/app/code
+            fi
             echo -e "Checking out branch ${BRANCH} from ${REPOSITORY}"
             git clone $REPOSITORY /tmp/paymentgatewaycloud  || error_exit "Failed to clone Repository $REPOSITORY"
             cd /tmp/paymentgatewaycloud
