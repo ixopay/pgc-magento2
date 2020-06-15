@@ -16,8 +16,8 @@ services:
       - './Pgc:/opt/bitnami/magento/htdocs/app/code/Pgc'
       - '${BUILD_ARTIFACT:-undefined}:/dist/paymentgatewaycloud.zip'
     ports:
-      - "${MAGENTO_HTTP}:80"
-      - '${MAGENTO_HTTPS}:443'
+      - "${MAGENTO_HTTP:-80}:80"
+      - '${MAGENTO_HTTPS:-443}:443'
     environment:
       - SCHEMA=http
       - ALLOW_EMPTY_PASSWORD=${ALLOW_EMPTY_PASSWORD:-yes}
