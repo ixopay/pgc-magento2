@@ -111,10 +111,10 @@ if [ ! -f "/setup_complete" ]; then
     echo -e "Import Products"
 
     if [ ! -d "/magento2-sample-data" ]; then
-        echo -e "Checking out branch 2.3.3 from https://github.com/magento/magento2-sample-data"
+        echo -e "Checking out branch 2.3.5 from https://github.com/magento/magento2-sample-data"
         git clone https://github.com/magento/magento2-sample-data /magento2-sample-data || error_exit "Failed to clone sample data"
         cd /magento2-sample-data
-        git checkout 2.3.3 || error_exit "Failed to checkout sample data Branch"
+        git checkout 2.3.5 || error_exit "Failed to checkout sample data Branch"
         php -f /magento2-sample-data/dev/tools/build-sample-data.php -- --ce-source="/opt/bitnami/magento/htdocs/" || error_exit "Failed to install sample data"
     fi
 
