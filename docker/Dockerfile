@@ -1,4 +1,4 @@
-FROM bitnami/magento:2.3.1
+FROM bitnami/magento:2-debian-10
 
 EXPOSE 80
 

@@ -1,7 +1,7 @@
 version: '3'
 services:
   mariadb:
-    image: 'bitnami/mariadb:10.2'
+    image: 'bitnami/mariadb:10.2-debian-10'
     hostname: mariadb
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
@@ -9,7 +9,7 @@ services:
       - MARIADB_PASSWORD=magento_db_password
       - MARIADB_DATABASE=bitnami_magento
   elasticsearch:
-    image: 'bitnami/elasticsearch:6'
+    image: 'bitnami/elasticsearch:6-debian-10'
   magento:
     build: 'docker/'
     volumes:
