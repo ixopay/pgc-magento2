@@ -243,6 +243,7 @@ if [ ! -f "/setup_complete" ]; then
     fi
 
 else
+    ln -s /opt/bitnami/magento /bitnami/magento
 
     if [ $MAGENTO_HOST ]; then
         echo -e "Updating Shop URL to: ${MAGENTO_HOST}"
