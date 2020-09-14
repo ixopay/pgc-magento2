@@ -1,4 +1,5 @@
-FROM bitnami/magento:2-debian-10
+ARG UPSTREAM_TAG=${UPSTREAM_TAG:-latest}  
+FROM bitnami/magento:${UPSTREAM_TAG}
 
 EXPOSE 80
 
