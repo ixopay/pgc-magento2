@@ -201,8 +201,8 @@ if [ ! -f "/setup_complete" ]; then
    
     if [ $PRECONFIGURE ]; then
         # Disable Login Captcha
-        php /opt/bitnami/magento/htdocs/bin/magento config:set msp_securitysuite_recaptcha/backend/enabled 0
-        php /opt/bitnami/magento/htdocs/bin/magento config:set msp_securitysuite_recaptcha/frontend/enabled 0
+        #php /opt/bitnami/magento/htdocs/bin/magento config:set msp_securitysuite_recaptcha/backend/enabled 0
+        #php /opt/bitnami/magento/htdocs/bin/magento config:set msp_securitysuite_recaptcha/frontend/enabled 0
         php /opt/bitnami/magento/htdocs/bin/magento config:set admin/security/use_case_sensitive_login 0
         php /opt/bitnami/magento/htdocs/bin/magento config:set admin/captcha/enable 0 
         php /opt/bitnami/magento/htdocs/bin/magento config:set customer/online_customers/section_data_lifetime 60
