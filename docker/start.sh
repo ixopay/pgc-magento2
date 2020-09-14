@@ -36,10 +36,7 @@ if [ ! -f "/setup_complete" ]; then
 
     while (! $(curl --silent -H "Host: ${MAGENTO_HOST}" http://localhost:80/index.php/ | grep "CMS homepage" > /dev/null)); do sleep 2s; done
 
-    fix_symlink /opt/bitnami/magento/htdocs/var /bitnami/magento/htdocs/var
-    fix_symlink /opt/bitnami/magento/htdocs/pub/static /bitnami/magento/htdocs/pub/static
-    fix_symlink /opt/bitnami/magento/htdocs/pub/media /bitnami/magento/htdocs/pub/media
-    fix_symlink /opt/bitnami/magento/htdocs/app/etc /bitnami/magento/htdocs/app/etc
+    fix_symlink /opt/bitnami/magento/htdocs /bitnami/magento/htdocs
     fix_symlink /opt/bitnami/magento/htdocs/app/design /bitnami/magento/htdocs/app/design || :
     #fix_symlink /opt/bitnami/magento/htdocs/app/code /bitnami/magento/htdocs/app/code || :
 
