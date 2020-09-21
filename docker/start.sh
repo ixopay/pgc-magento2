@@ -37,8 +37,8 @@ if [ ! -f "/setup_complete" ]; then
     while (! $(curl --silent -H "Host: ${MAGENTO_HOST}" http://localhost:80/index.php/ | grep "CMS homepage" > /dev/null)); do sleep 2s; done
 
     fix_symlink /opt/bitnami/magento/htdocs /bitnami/magento/htdocs
-    fix_symlink /opt/bitnami/magento/htdocs/app/design /bitnami/magento/htdocs/app/design || :
-    fix_symlink /opt/bitnami/magento/htdocs/app/code /bitnami/magento/htdocs/app/code || :
+    #fix_symlink /opt/bitnami/magento/htdocs/app/design /bitnami/magento/htdocs/app/design || :
+    #fix_symlink /opt/bitnami/magento/htdocs/app/code /bitnami/magento/htdocs/app/code || :
 
     echo -e "Installing PGC Extension"
 
