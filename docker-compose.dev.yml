@@ -14,7 +14,6 @@ services:
       - '80:8080'
       - '443:8443'
     environment:
-      - HTTPS=false
       - MAGENTO_HOST=localhost
       - MAGENTO_DATABASE_HOST=mariadb
       - MAGENTO_DATABASE_PORT_NUMBER=3306
@@ -23,6 +22,7 @@ services:
       - ELASTICSEARCH_HOST=elasticsearch
       - ELASTICSEARCH_PORT_NUMBER=9200
       - ALLOW_EMPTY_PASSWORD=yes
+      - HTTPS=false
       - MAGENTO_PASSWORD=${MAGENTO_PASSWORD:-bitnami1}
       - MAGENTO_USERNAME=${MAGENTO_USERNAME:-user}
       - DEMO_CUSTOMER_PASSWORD=${DEMO_CUSTOMER_PASSWORD:-customer}
@@ -37,7 +37,8 @@ services:
       - BRANCH=${BRANCH:-master}
     volumes:
       - 'magento_data:/bitnami/magento'
-      - './docker/configure.sh:/docker-entrypoint-init.d/configure.sh:ro'
+      - './Pgc:/source_code/Pgc:ro,consistent'
+      - './docker/link_source.sh:/docker-entrypoint-init.d/link_source.sh:ro'
     depends_on:
       - mariadb
       - elasticsearch
