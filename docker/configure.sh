@@ -23,7 +23,8 @@ echo -e "Import Sample Products"
 
 if [ ! -d "/magento2-sample-data" ]; then
     echo -e "Checking out branch 2.4.1 from https://github.com/magento/magento2-sample-data"
-    git clone -b 2.4.1 https://github.com/magento/magento2-sample-data /magento2-sample-data || error_exit "Failed to clone sample data"
+    mkdir /magento2-sample-data
+    curl -LJ "https://github.com/magento/magento2-sample-data/archive/2.4.1.tar.gz" | tar -xz --strip-components=1 --directory=/magento2-sample-data
     cd /magento2-sample-data
     php -f /magento2-sample-data/dev/tools/build-sample-data.php -- --ce-source="/bitnami/magento/" || error_exit "Failed to install sample data"
 fi
