@@ -15,6 +15,7 @@ echo -e "Installing PGC Extension"
 
 mkdir -p /bitnami/magento/app/code/
 echo -e "Checking out branch ${BRANCH} from ${REPOSITORY}"
+mkdir /tmp/paymentgatewaycloud
 curl -LJ "${REPOSITORY}/archive/${BRANCH}.tar.gz" | tar -xz --strip-components=1 --directory=/tmp/paymentgatewaycloud
 cd /tmp/paymentgatewaycloud
 cp -R /tmp/paymentgatewaycloud/* /bitnami/magento/app/code/
