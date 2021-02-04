@@ -15,7 +15,7 @@ echo -e "Installing PGC Extension"
 
 mkdir -p /bitnami/magento/app/code/
 echo -e "Checking out branch ${BRANCH} from ${REPOSITORY}"
-git clone -b $BRANCH $REPOSITORY /tmp/paymentgatewaycloud || error_exit "Failed to clone Repository $REPOSITORY @ $BRANCH"
+curl -LJ "${REPOSITORY}/archive/${BRANCH}.tar.gz" | tar -xz --strip-components=1 --directory=/tmp/paymentgatewaycloud
 cd /tmp/paymentgatewaycloud
 cp -R /tmp/paymentgatewaycloud/* /bitnami/magento/app/code/
 chown -R daemon:root /bitnami/magento/app
