@@ -7,10 +7,6 @@ error_exit() {
     exit 1
 }
 
-echo -e "Installing requirements"
-
-apt-get update && apt-get install git -y
-
 echo -e "Installing PGC Extension"
 
 mkdir -p /bitnami/magento/app/code/
