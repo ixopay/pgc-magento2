@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<csp_whitelist xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Csp/etc/csp_whitelist.xsd">
+    <policies>
+        <policy id="script-src">
+            <values>
+                <value id="prod-pgc-script" type="host">https://gateway.ixopay.com</value>
+                <value id="sandbox-pgc-script" type="host">https://sandbox.ixopay.com</value>
+                <value id="secure-pgc-script" type="host">https://secure.ixopay.com</value>
+            </values>
+        </policy>
+        <policy id="frame-src">
+            <values>
+                <value id="secure-pgc-frame" type="host">https://secure.ixopay.com</value>
+            </values>
+        </policy>
+        <policy id="connect-src">
+            <values>
+                <value id="prod-pgc-connect" type="host">https://gateway.ixopay.com</value>
+                <value id="sandbox-pgc-connect" type="host">https://sandbox.ixopay.com</value>
+            </values>
+        </policy>
+    </policies>
+</csp_whitelist>

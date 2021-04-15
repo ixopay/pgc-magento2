@@ -1,0 +1,37 @@
+<mapping xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Payment:etc/error_mapping.xsd">
+    <message_list>
+        <message code="1000" translate="true">Request failed.</message>
+        <message code="1001" translate="true">Invalid response.</message>
+        <message code="1002" translate="true">Invalid request data.</message>
+        <message code="1003" translate="true">Processing error.</message>
+        <message code="1004" translate="true">Invalid signature.</message>
+        <message code="1005" translate="true">Invalid XML.</message>
+        <message code="1006" translate="true">Logical error.</message>
+        <message code="1007" translate="true">Invalid configuration.</message>
+        <message code="1008" translate="true">Unexpected system error.</message>
+        <message code="1009" translate="true">Too many requests.</message>
+        <message code="9999" translate="true">Unknown error.</message>
+        <message code="2001" translate="true">Account closed externally.</message>
+        <message code="2002" translate="true">User cancelled.</message>
+        <message code="2003" translate="true">Transaction declined.</message>
+        <message code="2004" translate="true">Quota regulation.</message>
+        <message code="2005" translate="true">Transaction expired.</message>
+        <message code="2006" translate="true">Insufficient funds.</message>
+        <message code="2007" translate="true">Incorrect payment info.</message>
+        <message code="2008" translate="true">Invalid card.</message>
+        <message code="2009" translate="true">Expired card.</message>
+        <message code="2010" translate="true">Fraudulent card.</message>
+        <message code="2011" translate="true">Unsupported card.</message>
+        <message code="2012" translate="true">Transaction cancelled.</message>
+        <message code="2013" translate="true">Risk check block.</message>
+        <message code="2014" translate="true">Pickup card.</message>
+        <message code="2015" translate="true">Lost card.</message>
+        <message code="2016" translate="true">Stolen card.</message>
+        <message code="2017" translate="true">IBAN invalid.</message>
+        <message code="2018" translate="true">BIC invalid.</message>
+        <message code="2019" translate="true">Customer data invalid.</message>
+        <message code="2020" translate="true">CVV required.</message>
+        <message code="2021" translate="true">3D-Secure Verification failed.</message>
+    </message_list>
+</mapping>

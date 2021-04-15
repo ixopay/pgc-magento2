@@ -1,0 +1,90 @@
+version: "3.7"
+
+services:
+  magento:
+    image: "bitnami/magento:2.4.2-debian-10-r33"
+    ports:
+      - "${MAGENTO_EXTERNAL_HTTP_PORT_NUMBER}:${APACHE_HTTP_PORT_NUMBER}"
+      - "${MAGENTO_EXTERNAL_HTTPS_PORT_NUMBER}:${APACHE_HTTPS_PORT_NUMBER}"
+    environment:
+      # PGC config
+      - SHOP_PGC_SANDBOX
+      - SHOP_PGC_TITLE
+      - SHOP_PGC_DEBUG
+      - SHOP_PGC_3DS
+      - SHOP_PGC_PAYMENT_ACTION
+      - SHOP_PGC_SIGNATURE
+      - SHOP_PGC_SEAMLESS
+      - SHOP_PGC_VAULT
+      - SHOP_PGC_USER
+      - SHOP_PGC_USER_PW
+      - SHOP_PGC_PUBLIC_KEY
+      - SHOP_PGC_SHARED_SECRET
+      - SHOP_PGC_API_KEY
+      # Magento admin setup
+      - MAGENTO_USERNAME
+      - MAGENTO_PASSWORD
+      - MAGENTO_EMAIL
+      - MAGENTO_FIRST_NAME
+      - MAGENTO_LAST_NAME
+      # Magento system setup
+      - APACHE_HTTP_PORT_NUMBER
+      - APACHE_HTTPS_PORT_NUMBER
+      - MAGENTO_EXTERNAL_HTTP_PORT_NUMBER
+      - MAGENTO_EXTERNAL_HTTPS_PORT_NUMBER
+      - MAGENTO_HOST
+      - MAGENTO_MODE
+      - MAGENTO_ADMIN_URL_PREFIX
+      - MAGENTO_ENABLE_HTTPS
+      - MAGENTO_ENABLE_ADMIN_HTTPS
+      - MAGENTO_DATABASE_HOST
+      - MAGENTO_DATABASE_PORT_NUMBER
+      - MAGENTO_DATABASE_USER
+      - MAGENTO_DATABASE_NAME
+      - ALLOW_EMPTY_PASSWORD
+      # Elas config
+      - MAGENTO_ELASTICSEARCH_HOST
+      - MAGENTO_ELASTICSEARCH_PORT_NUMBER
+      # PHP config
+      - PHP_EXPOSE_PHP
+      - PHP_MAX_EXECUTION_TIME
+      - PHP_MAX_INPUT_TIME
+      - PHP_MAX_INPUT_VARS
+      - PHP_MEMORY_LIMIT
+      - PHP_POST_MAX_SIZE
+      - PHP_UPLOAD_MAX_FILESIZE
+    volumes:
+      - "magento_data:/bitnami/magento"
+      - '.:/paymentgatewaycloud:ro,consistent'
+      - "./docker/utils.sh:/utils.sh:ro"
+      - "./docker/sample-data.sh:/docker-entrypoint-init.d/01-sample-data.sh:ro"
+      - "./docker/pgc-source-code.sh:/docker-entrypoint-init.d/02-pgc-source-code.sh:ro"
+      - "./docker/configure.sh:/docker-entrypoint-init.d/03-configure.sh:ro"
+    depends_on:
+      - mariadb
+      - elasticsearch
+
+  mariadb:
+    image: "docker.io/bitnami/mariadb:10.3-debian-10"
+    environment:
+      - MARIADB_USER=${MAGENTO_DATABASE_USER}
+      - MARIADB_DATABASE=${MAGENTO_DATABASE_NAME}
+      - ALLOW_EMPTY_PASSWORD
+    volumes:
+      - "mariadb_data:/bitnami/mariadb"
+
+  elasticsearch:
+    image: "docker.io/bitnami/elasticsearch:6-debian-10"
+    volumes:
+      - "elasticsearch_data:/bitnami/elasticsearch/data"
+
+
+volumes:
+  mariadb_data:
+    driver: local
+
+  magento_data:
+    driver: local
+
+  elasticsearch_data:
+    driver: local

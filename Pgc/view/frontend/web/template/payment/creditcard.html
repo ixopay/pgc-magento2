@@ -1,0 +1,103 @@
+<div class="payment-method" data-bind="css: {'_active': (getCode() == isChecked())}">
+    <div class="payment-method-title field choice">
+        <input type="radio" name="payment[method]" class="radio"
+            data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()" />
+        <label data-bind="attr: {'for': getCode()}" class="label">
+            <span data-bind="text: getTitle()"></span>
+        </label>
+    </div>
+    <div class="payment-method-content">
+        <!-- ko foreach: getRegion('messages') -->
+        <!-- ko template: getTemplate() -->
+        <!-- /ko -->
+        <!--/ko-->
+        <div class="payment-method-billing-address">
+            <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
+            <!-- ko template: getTemplate() -->
+            <!-- /ko -->
+            <!--/ko-->
+        </div>
+
+        <!-- Render the native credit card form. -->
+        <!-- ko if: (isSeamless())-->
+        <form class="form pgc_seamless" action="#" method="post"
+            data-bind="attr: {'id': 'pgc_form_' + getCode()}, afterRender: initializeJsIntegration()">
+            <fieldset class="fieldset">
+                <div class="field required">
+                    <label data-bind="i18n: 'Card Holder'" , attr: {for: 'pgc_cc_card_holder_' + getCode()}"
+                        class="label"></label>
+                    <div class="control">
+                        <input class="input-text required" type="text" name="pgc_cc_card_holder"
+                            data-validate="{required:true}"
+                            data-bind="attr: {'id': 'pgc_cc_card_holder_' + getCode()}, value: ccHolder">
+                    </div>
+                </div>
+
+                <div class="field required">
+                    <label class="label" data-bind="i18n: 'Number'"></label>
+                    <div class="control">
+                        <div class="input-seamless" data-bind="attr: {'id': 'pgc_cc_number_' + getCode()}"></div>
+                    </div>
+                </div>
+
+                <div class="field required">
+                    <label class="label" data-bind="i18n: 'Expire Date'"></label>
+                    <div class="clearfix expire-month-year-sec">
+                        <div class="control input-expire-month">
+                            <label class="label" data-bind="i18n: 'Month'"></label>
+                            <input class="input-text required" type="text" name="pgc_cc_month"
+                                data-validate="{required:true}"
+                                data-bind="attr: {'id': 'pgc_cc_month_' + getCode()}, value: ccMonth">
+                        </div>
+                        <div class="control input-expire-year">
+                            <label class="label" data-bind="i18n: 'Year'"></label>
+                            <input class="input-text required" type="text" name="pgc_cc_year"
+                                data-validate="{required:true,minlength:4,maxlength:4}"
+                                data-bind="attr: {'id': 'pgc_cc_year_' + getCode()}, value: ccYear">
+                        </div>
+                    </div>
+                </div>
+                <div class="field required">
+                    <label class="label" data-bind="i18n: 'CVV'"></label>
+                    <div class="control">
+                        <div class="input-seamless" data-bind="attr: {'id': 'pgc_cc_cvv_' + getCode()}"></div>
+                    </div>
+                </div>
+                <!-- ko if: (isVaultEnabled())-->
+                <div class="field choice">
+                    <input type="checkbox"
+                           name="vault[is_enabled]"
+                           class="checkbox"
+                           data-bind="attr: {'id': getCode() + '_enable_vault'}, checked: vaultEnabler.isActivePaymentTokenEnabler"/>
+                    <label class="label" data-bind="attr: {'for': getCode() + '_enable_vault'}">
+                        <span><!-- ko i18n: 'Save for later use.'--><!-- /ko --></span>
+                    </label>
+                </div>
+                <!-- /ko -->
+            </fieldset>
+        </form>
+        <!-- /ko -->
+
+
+
+        <div class="checkout-agreements-block">
+            <!-- ko foreach: $parent.getRegion('before-place-order') -->
+            <!-- ko template: getTemplate() -->
+            <!-- /ko -->
+            <!--/ko-->
+        </div>
+
+        <div class="actions-toolbar">
+            <div class="primary">
+                <button data-role="review-save" type="submit" data-bind="
+                        attr: {title: $t('Place Order')},
+                        enable: (getCode() == isChecked()),
+                        click: placeOrder,
+                        css: {disabled: !isPlaceOrderActionAllowed()}
+                        " class="action primary checkout" disabled>
+                    <span data-bind="i18n: 'Place Order'"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

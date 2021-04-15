@@ -1,0 +1,375 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Config\Model\Config\TypePool">
+        <arguments>
+            <argument name="sensitive" xsi:type="array">
+                <item name="pgc/general/password" xsi:type="string">1</item>
+                <item name="payment/pgc_creditcard/api_key" xsi:type="string">1</item>
+                <item name="payment/pgc_creditcard/shared_secret" xsi:type="string">1</item>
+                <item name="payment/pgc_creditcard/integration_key" xsi:type="string">1</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- Payment Method Facade configuration -->
+    <virtualType name="PgcPaymentGatewayFacade" type="Magento\Payment\Model\Method\Adapter">
+        <arguments>
+            <argument name="code" xsi:type="const">Pgc\Pgc\Model\Ui\ConfigProvider::CREDITCARD_CODE</argument>
+            <argument name="formBlockType" xsi:type="string">Pgc\Pgc\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Pgc\Pgc\Block\Info</argument>
+            <argument name="valueHandlerPool" xsi:type="object">PgcPaymentGatewayValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">PgcPaymentGatewayCommandPool</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Logger, initialized with PgcPaymentGatewayConfig -->
+    <virtualType name="PgcPaymentGatewayLogger" type="Magento\Payment\Model\Method\Logger">
+        <arguments>
+            <argument name="config" xsi:type="object">PgcCardConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Pgc\Pgc\Gateway\Http\Client\TransactionAuthorization">
+        <arguments>
+            <argument name="logger" xsi:type="object">PgcPaymentGatewayLogger</argument>
+        </arguments>
+    </type>
+
+    <type name="Pgc\Pgc\Gateway\Http\Client\TransactionDebit">
+        <arguments>
+            <argument name="logger" xsi:type="object">PgcPaymentGatewayLogger</argument>
+        </arguments>
+    </type>
+
+    <type name="Pgc\Pgc\Gateway\Http\Client\TransactionVoid">
+        <arguments>
+            <argument name="logger" xsi:type="object">PgcPaymentGatewayLogger</argument>
+        </arguments>
+    </type>
+
+    <type name="Pgc\Pgc\Gateway\Http\Client\TransactionCapture">
+        <arguments>
+            <argument name="logger" xsi:type="object">PgcPaymentGatewayLogger</argument>
+        </arguments>
+    </type>
+
+    <type name="Pgc\Pgc\Gateway\Http\Client\TransactionRefund">
+        <arguments>
+            <argument name="logger" xsi:type="object">PgcPaymentGatewayLogger</argument>
+        </arguments>
+    </type>
+
+    <!-- CONFIG -->
+    <virtualType name="PgcCardConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">\Pgc\Pgc\Model\Ui\ConfigProvider::CREDITCARD_CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="PgcConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="string">pgc_pgc</argument>
+            <argument name="pathPattern" xsi:type="string">%s/%s</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Commands infrastructure -->
+    <virtualType name="PgcPaymentGatewayCommandPool" type="Magento\Payment\Gateway\Command\CommandPool">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="authorize" xsi:type="string">PgcPaymentGatewayAuthorizeCommand</item>
+                <item name="sale" xsi:type="string">PgcPaymentGatewaySaleCommand</item>
+                <item name="capture" xsi:type="string">PgcPaymentGatewayCaptureStrategyCommand</item>
+                <item name="settlement" xsi:type="string">PgcPaymentGatewayCaptureCommand</item>
+                <item name="vault_authorize" xsi:type="string">PgcPaymentGatewayVaultAuthorizeCommand</item>
+                <item name="vault_sale" xsi:type="string">PgcPaymentGatewayVaultSaleCommand</item>
+                <item name="vault_capture" xsi:type="string">PgcPaymentGatewayVaultCaptureCommand</item>
+                <item name="refund" xsi:type="string">PgcPaymentGatewayRefundCommand</item>
+                <item name="void" xsi:type="string">PgcPaymentGatewayVoidCommand</item>
+                <item name="cancel" xsi:type="string">PgcPaymentGatewayVoidCommand</item>
+                <item name="deny_payment" xsi:type="string">PgcPaymentGatewayVoidCommand</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="PgcPaymentGatewayCaptureStrategyCommand" type="Pgc\Pgc\Gateway\Command\CaptureStrategyCommand">
+        <arguments>
+            <argument name="commandPool" xsi:type="object">PgcPaymentGatewayCommandPool</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Authorize command -->
+    <virtualType name="PgcPaymentGatewayAuthorizeCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">PgcPaymentGatewayAuthorizationRequest</argument>
+            <argument name="handler" xsi:type="object">PgcPaymentGatewayResponseHandlerComposite</argument>
+            <argument name="transferFactory" xsi:type="object">Pgc\Pgc\Gateway\Http\TransferFactory</argument>
+            <argument name="validator" xsi:type="object">GeneralResponseValidator</argument>
+            <argument name="client" xsi:type="object">Pgc\Pgc\Gateway\Http\Client\TransactionAuthorization</argument>
+            <argument name="errorMessageMapper" xsi:type="object">Pgc\Pgc\Gateway\ErrorMapper\VirtualErrorMessageMapper</argument>
+        </arguments>
+    </virtualType>
+    <!-- Authorize command End-->
+
+    <!-- Authorize vault command -->
+    <virtualType name="PgcPaymentGatewayVaultAuthorizeCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">PgcPaymentGatewayAuthorizationVaultRequest</argument>
+            <argument name="transferFactory" xsi:type="object">Pgc\Pgc\Gateway\Http\TransferFactory</argument>
+            <argument name="client" xsi:type="object">Pgc\Pgc\Gateway\Http\Client\TransactionAuthorization</argument>
+            <argument name="handler" xsi:type="object">Pgc\Pgc\Gateway\Response\TxnIdHandler</argument>
+            <argument name="validator" xsi:type="object">GeneralResponseValidator</argument>
+            <argument name="errorMessageMapper" xsi:type="object">Pgc\Pgc\Gateway\ErrorMapper\VirtualErrorMessageMapper</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="PgcPaymentGatewayVaultSaleCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">PgcPaymentGatewayAuthorizationVaultRequest</argument>
+            <argument name="transferFactory" xsi:type="object">Pgc\Pgc\Gateway\Http\TransferFactory</argument>
+            <argument name="client" xsi:type="object">Pgc\Pgc\Gateway\Http\Client\TransactionDebit</argument>
+            <argument name="handler" xsi:type="object">Pgc\Pgc\Gateway\Response\DebitHandler</argument>
+            <argument name="validator" xsi:type="object">GeneralResponseValidator</argument>
+            <argument name="errorMessageMapper" xsi:type="object">Pgc\Pgc\Gateway\ErrorMapper\VirtualErrorMessageMapper</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="PgcPaymentGatewayVaultCaptureCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">Pgc\Pgc\Gateway\Request\CaptureRequest</argument>
+            <argument name="transferFactory" xsi:type="object">Pgc\Pgc\Gateway\Http\TransferFactory</argument>
+            <argument name="client" xsi:type="object">Pgc\Pgc\Gateway\Http\Client\TransactionCapture</argument>
+            <argument name="validator" xsi:type="object">GeneralResponseValidator</argument>
+            <argument name="handler" xsi:type="object">Pgc\Pgc\Gateway\Response\CaptureHandler</argument>
+            <argument name="errorMessageMapper" xsi:type="object">Pgc\Pgc\Gateway\ErrorMapper\VirtualErrorMessageMapper</argument>
+        </arguments>
+    </virtualType>
+    <!-- Authorize vault command end -->
+
+    <!-- Sale command -->
+    <virtualType name="PgcPaymentGatewaySaleCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">PgcPaymentGatewayAuthorizationRequest</argument>
+            <argument name="handler" xsi:type="object">PgcPaymentGatewaySaleResponseHandlerComposite</argument>
+            <argument name="transferFactory" xsi:type="object">Pgc\Pgc\Gateway\Http\TransferFactory</argument>
+            <argument name="validator" xsi:type="object">GeneralResponseValidator</argument>
+            <argument name="client" xsi:type="object">Pgc\Pgc\Gateway\Http\Client\TransactionDebit</argument>
+            <argument name="errorMessageMapper" xsi:type="object">Pgc\Pgc\Gateway\ErrorMapper\VirtualErrorMessageMapper</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Authorization Request -->
+    <virtualType name="PgcPaymentGatewayAuthorizationRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="transaction" xsi:type="string">Pgc\Pgc\Gateway\Request\AuthorizationRequest</item>
+                <item name="cvv" xsi:type="string">Pgc\Pgc\Gateway\Request\SaveCardRequest</item>
+                <item name="payment" xsi:type="string">Pgc\Pgc\Gateway\Request\PaymentDataBuilder</item>
+                <item name="customer" xsi:type="string">Pgc\Pgc\Gateway\Request\CustomerDataBuilder</item>
+                <item name="address" xsi:type="string">Pgc\Pgc\Gateway\Request\AddressDataBuilder</item>
+                <item name="threeDSecure" xsi:type="string">Pgc\Pgc\Gateway\Request\ThreeDSecureDataBuilder</item>
+                <item name="extraData" xsi:type="string">Pgc\Pgc\Gateway\Request\ExtraDataBuilder</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Pgc\Pgc\Gateway\Request\AuthorizationRequest">
+        <arguments>
+            <argument name="config" xsi:type="object">PgcCardConfig</argument>
+        </arguments>
+    </type>
+
+    <!-- Authorization vault Request -->
+    <virtualType name="PgcPaymentGatewayAuthorizationVaultRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="transaction" xsi:type="string">Pgc\Pgc\Gateway\Request\AuthorizationRequest</item>
+                <item name="cvv" xsi:type="string">Pgc\Pgc\Gateway\Request\SaveCardRequest</item>
+                <item name="vault" xsi:type="string">Pgc\Pgc\Gateway\Request\VaultDataBuilder</item>
+                <item name="payment" xsi:type="string">Pgc\Pgc\Gateway\Request\PaymentDataBuilder</item>
+                <item name="customer" xsi:type="string">Pgc\Pgc\Gateway\Request\CustomerDataBuilder</item>
+                <item name="address" xsi:type="string">Pgc\Pgc\Gateway\Request\AddressDataBuilder</item>
+                <item name="threeDSecure" xsi:type="string">Pgc\Pgc\Gateway\Request\ThreeDSecureDataBuilder</item>
+                <item name="extraData" xsi:type="string">Pgc\Pgc\Gateway\Request\ExtraDataBuilder</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!--General Response validator-->
+    <virtualType name="GeneralResponseValidator" type="Magento\Payment\Gateway\Validator\ValidatorComposite">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="general" xsi:type="string">Pgc\Pgc\Gateway\Validator\GeneralResponseValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Capture command -->
+    <virtualType name="PgcPaymentGatewayCaptureCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">Pgc\Pgc\Gateway\Request\CaptureRequest</argument>
+            <argument name="handler" xsi:type="object">Pgc\Pgc\Gateway\Response\CaptureHandler</argument>
+            <argument name="transferFactory" xsi:type="object">Pgc\Pgc\Gateway\Http\TransferFactory</argument>
+            <argument name="validator" xsi:type="object">GeneralResponseValidator</argument>
+            <argument name="client" xsi:type="object">Pgc\Pgc\Gateway\Http\Client\TransactionCapture</argument>
+            <argument name="errorMessageMapper" xsi:type="object">Pgc\Pgc\Gateway\ErrorMapper\VirtualErrorMessageMapper</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Capture Request -->
+    <type name="Pgc\Pgc\Gateway\Request\CaptureRequest">
+        <arguments>
+            <argument name="config" xsi:type="object">PgcCardConfig</argument>
+        </arguments>
+    </type>
+
+    <!-- Refund command -->
+    <virtualType name="PgcPaymentGatewayRefundCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">Pgc\Pgc\Gateway\Request\RefundDataBuilder</argument>
+            <argument name="handler" xsi:type="object">Pgc\Pgc\Gateway\Response\CaptureHandler</argument>
+            <argument name="transferFactory" xsi:type="object">Pgc\Pgc\Gateway\Http\TransferFactory</argument>
+            <argument name="validator" xsi:type="object">GeneralResponseValidator</argument>
+            <argument name="client" xsi:type="object">Pgc\Pgc\Gateway\Http\Client\TransactionRefund</argument>
+            <argument name="errorMessageMapper" xsi:type="object">Pgc\Pgc\Gateway\ErrorMapper\VirtualErrorMessageMapper</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Refund Request -->
+    <type name="Pgc\Pgc\Gateway\Request\RefundDataBuilder">
+        <arguments>
+            <argument name="config" xsi:type="object">PgcCardConfig</argument>
+        </arguments>
+    </type>
+
+    <!-- Void command -->
+    <virtualType name="PgcPaymentGatewayVoidCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">Pgc\Pgc\Gateway\Request\VoidRequest</argument>
+            <argument name="handler" xsi:type="object">Pgc\Pgc\Gateway\Response\VoidHandler</argument>
+            <argument name="transferFactory" xsi:type="object">Pgc\Pgc\Gateway\Http\TransferFactory</argument>
+            <argument name="validator" xsi:type="object">GeneralResponseValidator</argument>
+            <argument name="client" xsi:type="object">Pgc\Pgc\Gateway\Http\Client\TransactionVoid</argument>
+            <argument name="errorMessageMapper" xsi:type="object">Pgc\Pgc\Gateway\ErrorMapper\VirtualErrorMessageMapper</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Void Request -->
+    <type name="Pgc\Pgc\Gateway\Request\VoidRequest">
+        <arguments>
+            <argument name="config" xsi:type="object">PgcCardConfig</argument>
+        </arguments>
+    </type>
+
+    <!-- Authorize Response handlers -->
+    <virtualType name="PgcPaymentGatewayResponseHandlerComposite" type="Magento\Payment\Gateway\Response\HandlerChain">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="txnid" xsi:type="string">Pgc\Pgc\Gateway\Response\TxnIdHandler</item>
+                <item name="payment_details" xsi:type="string">Pgc\Pgc\Gateway\Response\CardDetailsHandler</item>
+                <item name="vault_details" xsi:type="string">Pgc\Pgc\Gateway\Response\VaultDetailsHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Sale Response handlers -->
+    <virtualType name="PgcPaymentGatewaySaleResponseHandlerComposite" type="Magento\Payment\Gateway\Response\HandlerChain">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="txnid" xsi:type="string">Pgc\Pgc\Gateway\Response\DebitHandler</item>
+                <item name="payment_details" xsi:type="string">Pgc\Pgc\Gateway\Response\CardDetailsHandler</item>
+                <item name="vault_details" xsi:type="string">Pgc\Pgc\Gateway\Response\VaultDetailsHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+
+
+    <!-- Value handlers infrastructure -->
+    <virtualType name="PgcPaymentGatewayValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">PgcPaymentGatewayConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="PgcPaymentGatewayConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">PgcCardConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Pgc\Pgc\Block\Info">
+        <arguments>
+            <argument name="config" xsi:type="object">PgcCardConfig</argument>
+        </arguments>
+    </type>
+
+    <!-- Configuration for Vault payments -->
+    <virtualType name="PgcVaultPaymentConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">\Pgc\Pgc\Model\Ui\ConfigProvider::CC_VAULT_CODE</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="PgcVaultPaymentValueHandler" type="VaultPaymentDefaultValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">PgcVaultPaymentConfig</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="PgcVaultPaymentValueHandlerPool" type="VaultPaymentValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">PgcVaultPaymentValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="PgcCreditCardVaultFacade" type="Magento\Vault\Model\Method\Vault">
+        <arguments>
+            <argument name="config" xsi:type="object">PgcVaultPaymentConfig</argument>
+            <argument name="valueHandlerPool" xsi:type="object">PgcVaultPaymentValueHandlerPool</argument>
+            <argument name="vaultProvider" xsi:type="object">PgcPaymentGatewayFacade</argument>
+            <argument name="code" xsi:type="const">\Pgc\Pgc\Model\Ui\ConfigProvider::CC_VAULT_CODE</argument>
+            <argument name="commandManagerPool" xsi:type="object">PgcCcVaultCommandManagerPool</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Command managers section for Vault -->
+    <virtualType name="PgcCommandManager" type="Magento\Payment\Gateway\Command\CommandManager">
+        <arguments>
+            <argument name="commandPool" xsi:type="object">PgcPaymentGatewayCommandPool</argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\Payment\Gateway\Command\CommandManagerPool">
+        <arguments>
+            <argument name="executors" xsi:type="array">
+                <item name="pgc_creditcard" xsi:type="string">PgcCommandManager</item>
+            </argument>
+        </arguments>
+    </type>
+    <virtualType name="PgcCcVaultCommandManagerPool" type="Magento\Payment\Gateway\Command\CommandManagerPool">
+        <arguments>
+            <argument name="executors" xsi:type="array">
+                <item name="pgc_creditcard" xsi:type="string">PgcCommandManager</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <!-- END command managers section for Vault -->
+
+    <!-- Pgc error code mapper -->
+    <virtualType name="Pgc\Pgc\Gateway\ErrorMapper\VirtualConfigReader" type="Magento\Payment\Gateway\ErrorMapper\VirtualConfigReader">
+        <arguments>
+            <argument name="fileName" xsi:type="string">pgc_error_mapping.xml</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Pgc\Pgc\Gateway\ErrorMapper\VirtualMappingData" type="Magento\Payment\Gateway\ErrorMapper\MappingData">
+        <arguments>
+            <argument name="reader" xsi:type="object">Pgc\Pgc\Gateway\ErrorMapper\VirtualConfigReader</argument>
+            <argument name="cacheId" xsi:type="string">pgc_error_mapper</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Pgc\Pgc\Gateway\ErrorMapper\VirtualErrorMessageMapper" type="Magento\Payment\Gateway\ErrorMapper\ErrorMessageMapper">
+        <arguments>
+            <argument name="messageMapping" xsi:type="object">Pgc\Pgc\Gateway\ErrorMapper\VirtualMappingData</argument>
+        </arguments>
+    </virtualType>
+</config>

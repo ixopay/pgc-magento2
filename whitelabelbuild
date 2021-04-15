@@ -1,0 +1,103 @@
+#!/usr/bin/env php
+<?php
+
+require_once('./whitelabel/bootstrap.php');
+
+if(wantsHelp()) {
+    $help = '';
+    $help .= "Usage: :script\n";
+    $help .= "            --package-name=IXOPAY\n";
+    $help .= "            --vendor-name=Payment\n";
+    $help .= "            --production-host=gateway.ixopay.com\n";
+    $help .= "            --sandbox-host=sandbox.ixopay.com\n";
+    $help .= "            --vault-host=secure.ixopay.com\n";
+
+    $help = str_replace(
+        [':script'],
+        [get_included_files()[0]],
+        $help,
+    );
+
+    echo $help;
+    exit;
+}
+
+$prodHost = getProdHost();
+$sandboxHost = getSandboxHost();
+$vaultHost = getVaultHost();
+$vendorName = pascalCase(getVendorName());
+$packageName = pascalCase(getPackageName());
+
+$version = '1.0.0';
+$distFilenamePrefix = 'magento';
+$distFilenameSuffix = '';
+$srcDir = './Pgc';
+$buildDir = sprintf('./build');
+$newSrcDir = sprintf('%s/%s/%s', $buildDir, $vendorName, $packageName);
+$distDir = './dist';
+$distFilename = trim(
+    sprintf(
+        '%s-%s-%s-%s-%s',
+        $distFilenamePrefix,
+        kebabCase($vendorName),
+        kebabCase($packageName),
+        $version,
+        $distFilenameSuffix,
+    ),
+    '-',
+);
+
+if(empty(isHostValid($prodHost))) {
+    error('--production-host is invalid');
+    usage();
+    exit;
+}
+
+if(empty(isHostValid($sandboxHost))) {
+    error('--sandbox-host is invalid');
+    usage();
+    exit;
+}
+
+if(empty(isHostValid($vaultHost))) {
+    error('--vault-host is invalid');
+    usage();
+    exit;
+}
+
+// Cleanup from previous build
+deleteDir($buildDir);
+deleteDir($distDir);
+
+highlight('Whitelabel Build Script');
+
+
+// Static string, we have to remove
+$replacementMap = [
+    'Pgc\\\\Pgc\\\\' => sprintf('%s\\\\%s\\\\', $vendorName, $packageName), // compose paths
+    'pgc/pgc-magento' => strtolower(sprintf('%s/%s-magento', $vendorName, $packageName)), // composer's package name
+    'gateway.ixopay.com' => $prodHost, // Prod gateway host
+    'sandbox.ixopay.com' => $sandboxHost, // Sandbox gateway host
+    'secure.ixopay.com' => $vaultHost, // Vault host
+    'Pgc\\Pgc' => sprintf('%s\\%s', $vendorName, $packageName), // PHP namespace
+    'Pgc_Pgc' => sprintf('%s_%s', $vendorName, $packageName), // Package identifer
+    'pgc_pgc' => sprintf('%s_%s', strtolower($vendorName), strtolower($packageName)), // frontend identifier
+    'Pgc' => $vendorName, // vendor prefix
+    'pgc' => strtolower($vendorName), // vendor identifier
+];
+
+info(sprintf(
+    'Building %s with module identifier "%s_%s"',
+    $distFilename,
+    $vendorName,
+    $packageName,
+));
+build($srcDir, $newSrcDir, $replacementMap);
+
+info(sprintf(
+    'Creating zip file %s.zip',
+   $distFilename,
+));
+zipBuildToDist($buildDir, $distDir, $distFilename, get_included_files()[0]);
+
+success('Build complete');

@@ -1,0 +1,21 @@
+<?php
+$code = $block->escapeHtml($block->getCode());
+?>
+<script>
+  //<![CDATA[
+  require(
+    [
+      'jquery',
+      'Pgc_Pgc/js/pgc',
+      'Magento_Sales/order/create/form',
+      'domReady!'
+    ], function($, Pgc) {
+      var config = <?php /* @noEscape */ echo $block->getPaymentConfig(); ?>,
+        payment,
+        form = $('#payment_form_<?php /* @noEscape */ echo $code; ?>');
+
+      config.active = form.length > 0 && !form.is(':hidden');
+      payment = new Pgc(config);
+    });
+  //]]>
+</script>

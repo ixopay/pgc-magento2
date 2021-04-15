@@ -1,0 +1,120 @@
+<?php
+
+/**
+ * @var \Magento\Payment\Block\Adminhtml\Transparent\Form $block
+ * @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer
+ */
+$code = $block->escapeHtml($block->getMethodCode());
+$ccType = $block->getInfoData('cc_type');
+$ccExpMonth = $block->getInfoData('cc_exp_month');
+$ccExpYear = $block->getInfoData('cc_exp_year');
+?>
+<fieldset class="admin__fieldset payment-method"
+          id="payment_form_<?= /* @noEscape */
+          $code ?>"
+          style="display:none"
+>
+
+    <div class="admin__field _required">
+        <label class="label admin__field-label">
+            <span><?= $block->escapeHtml(__('Card Holder')) ?></span>
+        </label>
+        <div class="admin__field-control control">
+            <input type="text" id="card_holder" name="card_holder"/>
+            <label class="mage-error pgc-error" id="card_holder-error"></label>
+        </div>
+    </div>
+
+    <div class="admin__field _required">
+        <label class="label admin__field-label">
+            <span><?= $block->escapeHtml(__('Number')) ?></span>
+        </label>
+        <div class="admin__field-control control">
+            <div id="number_div" class="admin__control-text pgc-control">
+                <span class="icon-type"></span>
+            </div>
+            <label class="mage-error  pgc-error" id="number-error"></label>
+        </div>
+    </div>
+    <?php if ($block->hasVerification()): ?>
+        <div class="admin__field _required">
+            <label class="label admin__field-label">
+                <span><?= $block->escapeHtml(__('CVV')) ?></span>
+            </label>
+            <div class="admin__field-control control">
+                <div id="cvv_div" class="admin__control-text pgc-control pgc-cid"></div>
+                <label class="mage-error pgc-error" id="cvv-error"></label>
+            </div>
+        </div>
+    <?php endif; ?>
+    <div class="admin__field _required">
+        <label class="label admin__field-label">
+            <span><?= $block->escapeHtml(__('Expire Date')) ?></span>
+        </label>
+        <div class="admin__field-control control">
+            <div class="pgc-date-wrap">
+                <div class="expiration-date-section">
+                    <input type="text" id="exp_month" name="exp_month"/>
+                    <label class="mage-error pgc-error" id="month-error"></label>
+                </div>
+                <div class="divider-line">/</div>
+                <div class="expiration-date-section">
+                    <input type="text" id="exp_year" name="exp_year" pattern="[1-9]{1}[0-9]{3}" maxlength="4" minlength="4"/>
+                    <label class="mage-error pgc-error" id="year-error"></label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="field-tooltip-content">
+        <input type="checkbox" id="pgc_cc_vault" name="payment[is_active_payment_token_enabler]" class="admin__control-checkbox">
+        <label class="label" for="pgc_cc_vault">
+            <span>Save for later use.</span>
+        </label>
+    </div>
+
+    <input type="hidden" id="<?= $block->escapeHtmlAttr($code) ?>_transactionToken" name="payment[transactionToken]"
+           value=""/>
+    <input type="submit" name="Submit" style="display: none;">
+</fieldset>
+<?= /* @noEscape */
+$secureRenderer->renderStyleAsTag(
+    "display:none",
+    'fieldset#payment_form_' . /* @noEscape */ $code
+) ?>
+<style>
+    #card_holder {
+        height: 3.4rem;
+        width: 100%;
+        border: 1px solid #adadad;
+        transition: border-color .1s linear;
+        padding: .6rem 1rem .6rem;
+    }
+
+    .pgc-control {
+        height: 3.4rem;
+        position: relative
+    }
+
+    .pgc-date-wrap {
+        display: flex;
+        align-items: baseline;
+    }
+
+    .expiration-date-section input {
+        width: 100%;
+        height: 3.4rem;
+        padding: .6rem 1rem .6rem;
+        border: 1px solid #adadad;
+        transition: border-color .1s linear;
+    }
+
+    .expiration-date-section label {
+        display: block;
+        width: 100%;
+    }
+
+    .divider-line {
+        padding: 8px 6px;
+        align-self: baseline;
+    }
+</style>

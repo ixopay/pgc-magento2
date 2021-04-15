@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="js">
+            <block class="Pgc\Pgc\Block\Checkout\PaymentJsLoader" template="Pgc_Pgc::payment-js-loader.phtml"
+                   name="pgc.checkout.script"/>
+        </referenceContainer>
+
+        <referenceBlock name="order.create.billing.method.form">
+            <action method="setMethodFormTemplate">
+                <argument name="method" xsi:type="string">pgc_creditcard</argument>
+                <argument name="template" xsi:type="string">Pgc_Pgc::form/cc.phtml</argument>
+            </action>
+
+            <action method="setMethodFormTemplate">
+                <argument name="method" xsi:type="string">pgc_cc_vault</argument>
+                <argument name="template" xsi:type="string">Magento_Vault::form/vault.phtml</argument>
+            </action>
+        </referenceBlock>
+    </body>
+</page>
